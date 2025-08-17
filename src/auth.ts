@@ -123,4 +123,4 @@ export const authConfig = {
 
 const nextAuth = NextAuth(authConfig)
 
-export const { signIn, signOut, auth } = nextAuth
+export const { handlers, signIn, signOut, auth } = nextAuth

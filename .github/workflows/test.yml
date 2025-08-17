@@ -80,6 +80,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
+      - name: Clean Next.js cache
+        run: rm -rf .next
+      
+      - name: Install Next.js SWC dependencies
+        run: |
+          npm install @next/swc-linux-x64-gnu @next/swc-linux-x64-musl --save-dev || echo "SWC install failed, continuing..."
+      
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
       

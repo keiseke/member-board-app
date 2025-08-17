@@ -26,7 +26,7 @@ const PostSchema = new Schema<IPostDocument>({
   content: {
     type: String,
     required: true,
-    maxlength: 500,
+    maxlength: 1000,
   },
   threadId: {
     type: Schema.Types.ObjectId,

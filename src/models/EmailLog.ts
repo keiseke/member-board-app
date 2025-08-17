@@ -86,7 +86,7 @@ EmailLogSchema.statics.getDeliveryStats = async function(
   dateFrom?: Date,
   dateTo?: Date
 ) {
-  const matchConditions: any = {}
+  const matchConditions: Record<string, unknown> = {}
   
   if (dateFrom || dateTo) {
     matchConditions.createdAt = {}

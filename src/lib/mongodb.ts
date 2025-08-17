@@ -13,12 +13,7 @@ interface CachedConnection {
   promise: Promise<typeof mongoose> | null
 }
 
-interface GlobalMongoose {
-  mongoose?: CachedConnection
-}
-
 declare global {
-  // eslint-disable-next-line no-var
   var mongoose: CachedConnection | undefined
 }
 

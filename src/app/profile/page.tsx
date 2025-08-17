@@ -1,13 +1,12 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useSession, signOut, getSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import {
   Container,
   Typography,
   Box,
-  Paper,
   Button,
   TextField,
   Grid,
@@ -25,8 +24,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Tabs,
-  Tab,
   Divider
 } from '@mui/material'
 import {

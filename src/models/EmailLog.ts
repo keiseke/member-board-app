@@ -19,6 +19,12 @@ export interface IEmailLog extends mongoose.Document {
   deliveryAttempts: number
 }
 
+export interface IEmailLogModel extends mongoose.Model<IEmailLog> {
+  getDeliveryStats(dateFrom?: Date, dateTo?: Date): Promise<Record<string, unknown>[]>
+  getRetryableEmails(maxAttempts?: number, olderThanMinutes?: number): Promise<IEmailLog[]>
+  cleanup(daysToKeep?: number): Promise<mongoose.mongo.DeleteResult>
+}
+
 const EmailLogSchema = new mongoose.Schema<IEmailLog>({
   to: [{
     type: String,
@@ -89,9 +95,10 @@ EmailLogSchema.statics.getDeliveryStats = async function(
   const matchConditions: Record<string, unknown> = {}
   
   if (dateFrom || dateTo) {
-    matchConditions.createdAt = {}
-    if (dateFrom) matchConditions.createdAt.$gte = dateFrom
-    if (dateTo) matchConditions.createdAt.$lte = dateTo
+    const createdAtCondition: Record<string, Date> = {}
+    if (dateFrom) createdAtCondition.$gte = dateFrom
+    if (dateTo) createdAtCondition.$lte = dateTo
+    matchConditions.createdAt = createdAtCondition
   }
 
   return await this.aggregate([
@@ -145,4 +152,4 @@ EmailLogSchema.statics.cleanup = async function(daysToKeep: number = 90) {
   })
 }
 
-export const EmailLog = mongoose.models.EmailLog || mongoose.model<IEmailLog>('EmailLog', EmailLogSchema)
+export const EmailLog = (mongoose.models.EmailLog || mongoose.model<IEmailLog>('EmailLog', EmailLogSchema)) as IEmailLogModel

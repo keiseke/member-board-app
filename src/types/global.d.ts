@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
 import { DefaultSession } from 'next-auth';
+import type mongoose from 'mongoose';
 
 declare global {
   var mongoose: {
@@ -12,6 +12,9 @@ declare module 'next-auth' {
   interface Session {
     user: {
       id: string;
+      email: string;
+      name?: string;
+      role?: string;
       emailVerified: boolean;
     } & DefaultSession['user']
   }

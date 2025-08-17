@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
+import { connectDB } from '@/lib/mongodb';
 import Thread from '@/models/Thread';
 import Post from '@/models/Post';
 
@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await dbConnect();
+    await connectDB();
     const { id } = await params;
     
     const thread = await Thread.findById(id);
@@ -34,7 +34,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await dbConnect();
+    await connectDB();
     const { id } = await params;
     const body = await request.json();
     const { title, description, category, creator } = body;
@@ -79,7 +79,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await dbConnect();
+    await connectDB();
     const { id } = await params;
 
     const thread = await Thread.findByIdAndDelete(id);

@@ -136,6 +136,9 @@ export async function POST(request: NextRequest) {
         
         // ネイティブMongoDBドライバーでも試行
         const db = mongoose.connection.db
+        if (!db) {
+          throw new Error('データベース接続が確立されていません')
+        }
         const usersCollection = db.collection('users')
         const nativeResult = await usersCollection.updateOne(
           { _id: objectId },
@@ -152,7 +155,7 @@ export async function POST(request: NextRequest) {
     } catch (saveError) {
       console.error('データベース保存エラー:', saveError)
       return NextResponse.json(
-        { error: 'データベース保存に失敗しました: ' + saveError.message },
+        { error: 'データベース保存に失敗しました: ' + (saveError instanceof Error ? saveError.message : String(saveError)) },
         { status: 500 }
       )
     }

@@ -130,8 +130,10 @@ jest.mock('bson', () => ({
   }
 }))
 
-// dbConnectのモック
-jest.mock('@/lib/dbConnect', () => jest.fn().mockResolvedValue({}))
+// データベース接続のモック
+jest.mock('@/lib/mongodb', () => ({
+  connectDB: jest.fn().mockResolvedValue({})
+}))
 
 // Post モデルのモック - 修正版
 const createMockPost = () => ({

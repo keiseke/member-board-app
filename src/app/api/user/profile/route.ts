@@ -43,6 +43,9 @@ export async function GET() {
 
     // ネイティブMongoDBでも確認
     const db = mongoose.connection.db
+    if (!db) {
+      throw new Error('データベース接続が確立されていません')
+    }
     const usersCollection = db.collection('users')
     const nativeUser = await usersCollection.findOne({ _id: new mongoose.Types.ObjectId(session.user.id) })
     console.log('ネイティブユーザー取得結果:', {

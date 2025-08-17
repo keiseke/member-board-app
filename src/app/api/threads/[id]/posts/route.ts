@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
+import { connectDB } from '@/lib/mongodb';
 import Post from '@/models/Post';
 import Thread from '@/models/Thread';
 
@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await dbConnect();
+    await connectDB();
     const { id } = await params;
     
     const posts = await Post.find({ threadId: id }).sort({ createdAt: 1 });
@@ -27,7 +27,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await dbConnect();
+    await connectDB();
     const { id } = await params;
     const body = await request.json();
     const { title, content, author } = body;

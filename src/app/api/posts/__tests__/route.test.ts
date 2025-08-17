@@ -1,5 +1,7 @@
 // Jest mocks must be at the top
-jest.mock('@/lib/dbConnect', () => jest.fn())
+jest.mock('@/lib/mongodb', () => ({
+  connectDB: jest.fn()
+}))
 jest.mock('@/models/Post', () => ({
   default: Object.assign(jest.fn(() => ({ save: jest.fn() })), {
     find: jest.fn()
@@ -8,16 +10,16 @@ jest.mock('@/models/Post', () => ({
 
 import { GET, POST } from '../route'
 import { NextRequest } from 'next/server'
-import dbConnect from '@/lib/dbConnect'
+import { connectDB } from '@/lib/mongodb'
 import Post from '@/models/Post'
 
-const mockDbConnect = dbConnect as jest.MockedFunction<typeof dbConnect>
+const mockConnectDB = connectDB as jest.MockedFunction<typeof connectDB>
 const mockPost = Post as jest.MockedFunction<typeof Post> & { find: jest.MockedFunction<() => { sort: jest.MockedFunction<() => Promise<unknown[]>> }> }
 
 describe('/api/posts', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockDbConnect.mockResolvedValue(undefined)
+    mockConnectDB.mockResolvedValue(undefined)
   })
 
   describe('GET', () => {

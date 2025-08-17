@@ -1,14 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
+import { z } from 'zod';
+import { auth } from '@/auth';
+import { connectDB } from '@/lib/mongodb';
 import Thread from '@/models/Thread';
 
-export async function GET() {
+const threadSchema = z.object({
+  title: z.string().min(1, 'タイトルを入力してください').max(100, 'タイトルは100文字以内で入力してください'),
+  description: z.string().min(1, '説明を入力してください').max(300, '説明は300文字以内で入力してください'),
+  category: z.string().min(1, 'カテゴリーを選択してください').max(50, 'カテゴリーは50文字以内で入力してください')
+});
+
+export async function GET(request: NextRequest) {
   try {
-    await dbConnect();
-    const threads = await Thread.find({}).sort({ updatedAt: -1 });
+    await connectDB();
+    const threads = await Thread.find({})
+      .populate('creator', 'name')
+      .sort({ updatedAt: -1 });
+    
     return NextResponse.json(threads);
   } catch (error) {
-    console.error('Threads fetch error:', error);
+    console.error('スレッド取得エラー:', error);
     return NextResponse.json(
       { error: 'スレッドの取得に失敗しました' },
       { status: 500 }
@@ -18,28 +29,48 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    await dbConnect();
-    const body = await request.json();
-    const { title, description, category, creator } = body;
-
-    if (!title || !description || !category) {
+    const session = await auth();
+    
+    if (!session?.user) {
       return NextResponse.json(
-        { error: 'タイトル、説明、カテゴリーは必須です' },
+        { error: 'ログインが必要です' },
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+    
+    const validatedFields = threadSchema.safeParse(body);
+    
+    if (!validatedFields.success) {
+      return NextResponse.json(
+        { 
+          error: 'バリデーションエラー',
+          details: validatedFields.error.flatten().fieldErrors
+        },
         { status: 400 }
       );
     }
+
+    const { title, description, category } = validatedFields.data;
+
+    await connectDB();
 
     const thread = new Thread({
       title,
       description,
       category,
-      creator: creator || '匿名',
+      creator: session.user.id,
+      creatorName: session.user.name,
     });
 
     await thread.save();
-    return NextResponse.json(thread, { status: 201 });
+    
+    const populatedThread = await Thread.findById(thread._id).populate('creator', 'name');
+    
+    return NextResponse.json(populatedThread, { status: 201 });
   } catch (error) {
-    console.error('Thread creation error:', error);
+    console.error('スレッド作成エラー:', error);
     return NextResponse.json(
       { error: 'スレッドの作成に失敗しました' },
       { status: 500 }

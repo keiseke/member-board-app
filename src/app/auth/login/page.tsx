@@ -30,9 +30,19 @@ export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
+  const message = searchParams.get('message')
   
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const getSuccessMessage = () => {
+    switch (message) {
+      case 'email_verified':
+        return 'メール認証が完了しました。ログインしてください。'
+      default:
+        return null
+    }
+  }
 
   const {
     register,
@@ -88,6 +98,12 @@ export default function LoginPage() {
           <Typography component="h1" variant="h4" gutterBottom>
             ログイン
           </Typography>
+
+          {getSuccessMessage() && (
+            <Alert severity="success" sx={{ width: '100%', mb: 2 }}>
+              {getSuccessMessage()}
+            </Alert>
+          )}
 
           {error && (
             <Alert severity="error" sx={{ width: '100%', mb: 2 }}>

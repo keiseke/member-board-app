@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { connectDB } from '@/lib/mongodb'
 import { User } from '@/models/User'
+import { sendWelcomeEmail } from '@/lib/email/client'
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,10 +31,22 @@ export async function POST(request: NextRequest) {
     }
 
     // メール認証完了
+    const wasUnverified = !user.emailVerified
     user.emailVerified = true
     user.emailVerificationToken = undefined
     user.emailVerificationExpires = undefined
     await user.save()
+
+    // 初回認証完了時にウェルカムメールを送信
+    if (wasUnverified) {
+      try {
+        await sendWelcomeEmail(user.email, user.name)
+        console.log('✅ ウェルカムメール送信成功:', user.email)
+      } catch (welcomeEmailError) {
+        console.error('❌ ウェルカムメール送信エラー:', welcomeEmailError)
+        // ウェルカムメール送信失敗でも認証完了は成功として扱う
+      }
+    }
 
     return NextResponse.json({
       message: 'メール認証が完了しました。ログインしてください。'

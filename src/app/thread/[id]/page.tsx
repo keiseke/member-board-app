@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import {
   Container,
   Typography,
@@ -17,51 +18,54 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  ThemeProvider,
-  createTheme,
-  CssBaseline,
+  AppBar,
+  Toolbar,
 } from '@mui/material';
-import { Add, ArrowBack, Forum, MoreVert, Edit, Delete } from '@mui/icons-material';
+import { Add, ArrowBack, Forum, MoreVert, Edit, Delete, AccountCircle, ExitToApp as LogoutIcon } from '@mui/icons-material';
+import { signOut } from 'next-auth/react';
 import PostForm from '@/components/PostForm';
 import ThreadForm from '@/components/ThreadForm';
-import { IPost } from '@/models/Post';
-import { IThread } from '@/models/Thread';
 
-const theme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: {
-      main: '#ec4899',
-      light: '#f9a8d4',
-      dark: '#be185d',
-    },
-    secondary: {
-      main: '#f3e8ff',
-      light: '#fdf2f8',
-      dark: '#a855f7',
-    },
-    background: {
-      default: '#fdf2f8',
-      paper: '#fce7f3',
-    },
-  },
-});
+interface Thread {
+  _id: string;
+  title: string;
+  description: string;
+  category: string;
+  creator: string;
+  creatorName: string;
+  postCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface Post {
+  _id: string;
+  title: string;
+  content: string;
+  threadId: string;
+  author: string;
+  authorName: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 
 export default function ThreadPage() {
   const params = useParams();
   const router = useRouter();
   const threadId = params.id as string;
+  const { data: session, status } = useSession();
 
-  const [thread, setThread] = useState<(IThread & { _id: string }) | null>(null);
-  const [posts, setPosts] = useState<(IPost & { _id: string })[]>([]);
+  const [thread, setThread] = useState<Thread | null>(null);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isThreadFormOpen, setIsThreadFormOpen] = useState(false);
-  const [editingPost, setEditingPost] = useState<(IPost & { _id: string }) | null>(null);
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [postMenuAnchorEl, setPostMenuAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedPost, setSelectedPost] = useState<(IPost & { _id: string }) | null>(null);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState('匿名'); // TODO: 実際のユーザー管理を実装する場合はここを変更
+  const [headerMenuAnchorEl, setHeaderMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
     message: '',
@@ -112,7 +116,10 @@ export default function ThreadPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          author: session?.user?.id,
+        }),
       });
 
       if (response.ok) {
@@ -192,7 +199,7 @@ export default function ThreadPage() {
   };
 
   const canEditThread = () => {
-    return thread && thread.creator === currentUser;
+    return thread && session?.user?.id && thread.creator === session.user.id;
   };
 
   const handleUpdatePost = async (data: { title: string; content: string; author?: string }) => {
@@ -267,8 +274,8 @@ export default function ThreadPage() {
     handlePostMenuClose();
   };
 
-  const canEditPost = (post: IPost & { _id: string }) => {
-    return post.author === currentUser;
+  const canEditPost = (post: Post) => {
+    return session?.user?.id && post.author === session.user.id;
   };
 
   const handleClosePostForm = () => {
@@ -294,6 +301,14 @@ export default function ThreadPage() {
     });
   };
 
+  const handleHeaderMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setHeaderMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleHeaderMenuClose = () => {
+    setHeaderMenuAnchorEl(null);
+  };
+
   if (loading) {
     return (
       <Container maxWidth="md" sx={{ py: 4, textAlign: 'center' }}>
@@ -311,15 +326,32 @@ export default function ThreadPage() {
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Box
-        sx={{
-          minHeight: '100vh',
-          background: 'linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #f9a8d4 100%)',
-        }}
-      >
-      <Container maxWidth="md" sx={{ py: 4 }}>
+    <>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            会員制掲示板
+          </Typography>
+          <IconButton
+            color="inherit"
+            onClick={handleHeaderMenuClick}
+          >
+            <AccountCircle />
+          </IconButton>
+          <Menu
+            anchorEl={headerMenuAnchorEl}
+            open={Boolean(headerMenuAnchorEl)}
+            onClose={handleHeaderMenuClose}
+          >
+            <MenuItem onClick={() => signOut()}>
+              <LogoutIcon sx={{ mr: 1 }} />
+              ログアウト
+            </MenuItem>
+          </Menu>
+        </Toolbar>
+      </AppBar>
+
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Box sx={{ mb: 3 }}>
           <Button
             startIcon={<ArrowBack />}
@@ -329,12 +361,7 @@ export default function ThreadPage() {
             スレッド一覧に戻る
           </Button>
           
-          <Card sx={{
-            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            mb: 3,
-          }}>
+          <Card sx={{ mb: 3 }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
                 <Box sx={{ 
@@ -404,11 +431,7 @@ export default function ThreadPage() {
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {posts.length === 0 ? (
-            <Card sx={{
-              backgroundColor: 'rgba(255, 255, 255, 0.7)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-            }}>
+            <Card>
               <CardContent sx={{ textAlign: 'center', py: 4 }}>
                 <Typography variant="h6" color="text.secondary">
                   まだ投稿がありません
@@ -420,14 +443,7 @@ export default function ThreadPage() {
             </Card>
           ) : (
             posts.map((post, index) => (
-              <Card
-                key={post._id}
-                sx={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                }}
-              >
+              <Card key={post._id} sx={{ mb: 2 }}>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 1 }}>
                     <Box sx={{ 
@@ -553,7 +569,6 @@ export default function ThreadPage() {
           </Alert>
         </Snackbar>
       </Container>
-      </Box>
-    </ThemeProvider>
+    </>
   );
 }

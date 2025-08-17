@@ -7,10 +7,21 @@ import { connectDB } from '@/lib/mongodb'
 import { User } from '@/models/User'
 import { sendVerificationEmail } from '@/lib/email/client'
 
+const passwordSchema = z.string()
+  .min(8, 'パスワードは8文字以上で入力してください')
+  .regex(/^(?=.*[a-z])/, '小文字を含む必要があります')
+  .regex(/^(?=.*[A-Z])/, '大文字を含む必要があります')
+  .regex(/^(?=.*\d)/, '数字を含む必要があります')
+  .regex(/^(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/, '特殊文字を含む必要があります')
+
 const registerSchema = z.object({
   name: z.string().min(1, '名前を入力してください').max(50, '名前は50文字以内で入力してください'),
   email: z.string().email('正しいメールアドレスを入力してください'),
-  password: z.string().min(6, 'パスワードは6文字以上で入力してください')
+  password: passwordSchema,
+  confirmPassword: z.string()
+}).refine(data => data.password === data.confirmPassword, {
+  message: "パスワードが一致しません",
+  path: ["confirmPassword"]
 })
 
 export async function POST(request: NextRequest) {

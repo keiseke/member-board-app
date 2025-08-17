@@ -6,6 +6,8 @@ export interface IUser extends mongoose.Document {
   name: string
   email: string
   password: string
+  bio?: string
+  avatarUrl?: string
   emailVerified: boolean
   emailVerificationToken?: string
   emailVerificationExpires?: Date
@@ -25,7 +27,6 @@ const UserSchema = new mongoose.Schema<IUser>({
   email: {
     type: String,
     required: [true, 'メールアドレスを入力してください'],
-    unique: true,
     lowercase: true,
     match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, '正しいメールアドレスを入力してください']
   },
@@ -34,6 +35,15 @@ const UserSchema = new mongoose.Schema<IUser>({
     required: [true, 'パスワードを入力してください'],
     minlength: [6, 'パスワードは6文字以上で入力してください'],
     select: false // デフォルトでは取得しない
+  },
+  bio: {
+    type: String,
+    maxlength: [200, '自己紹介は200文字以内で入力してください'],
+    trim: true
+  },
+  avatarUrl: {
+    type: String,
+    trim: true
   },
   emailVerified: {
     type: Boolean,

@@ -1,11 +1,20 @@
 // src/lib/email/config.ts
 export const emailConfig = {
-  // SMTP設定
+  // SMTP設定 (Gmail OAuth2対応)
   smtp: {
-    host: process.env.SMTP_HOST || 'mkpapa.com',
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.SMTP_PORT || '587'),
     secure: process.env.SMTP_SECURE === 'true',
-    auth: {
+    auth: process.env.GMAIL_OAUTH_CLIENT_ID ? {
+      // Gmail OAuth2認証
+      type: 'OAuth2',
+      user: process.env.GMAIL_USER || process.env.SMTP_USER,
+      clientId: process.env.GMAIL_OAUTH_CLIENT_ID,
+      clientSecret: process.env.GMAIL_OAUTH_CLIENT_SECRET,
+      refreshToken: process.env.GMAIL_OAUTH_REFRESH_TOKEN,
+      accessToken: process.env.GMAIL_OAUTH_ACCESS_TOKEN,
+    } : {
+      // 従来のユーザー名/パスワード認証
       user: process.env.SMTP_USER || '',
       pass: process.env.SMTP_PASSWORD || ''
     },

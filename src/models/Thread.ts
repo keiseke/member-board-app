@@ -4,7 +4,8 @@ export interface IThread extends Document {
   title: string;
   description: string;
   category: string;
-  creator: string;
+  creator: mongoose.Types.ObjectId;
+  creatorName: string;
   createdAt: Date;
   updatedAt: Date;
   postCount: number;
@@ -30,9 +31,13 @@ const ThreadSchema = new Schema<IThread>({
     maxlength: 50
   },
   creator: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  creatorName: {
     type: String,
     required: true,
-    default: '匿名',
     maxlength: 50
   },
   postCount: {

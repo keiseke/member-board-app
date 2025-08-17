@@ -18,10 +18,17 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 
+const passwordSchema = z.string()
+  .min(8, 'パスワードは8文字以上で入力してください')
+  .regex(/^(?=.*[a-z])/, '小文字を含む必要があります')
+  .regex(/^(?=.*[A-Z])/, '大文字を含む必要があります')
+  .regex(/^(?=.*\d)/, '数字を含む必要があります')
+  .regex(/^(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/, '特殊文字を含む必要があります')
+
 const registerSchema = z.object({
   name: z.string().min(1, '名前を入力してください').max(50, '名前は50文字以内で入力してください'),
   email: z.string().email('正しいメールアドレスを入力してください'),
-  password: z.string().min(6, 'パスワードは6文字以上で入力してください'),
+  password: passwordSchema,
   confirmPassword: z.string()
 }).refine((data) => data.password === data.confirmPassword, {
   message: "パスワードが一致しません",
@@ -57,17 +64,15 @@ export default function RegisterPage() {
         body: JSON.stringify({
           name: data.name,
           email: data.email,
-          password: data.password
+          password: data.password,
+          confirmPassword: data.confirmPassword
         })
       })
 
       const result = await response.json()
 
       if (response.ok) {
-        setSuccess(true)
-        setTimeout(() => {
-          router.push('/auth/login')
-        }, 3000)
+        router.push(`/auth/verify-email/pending?email=${encodeURIComponent(data.email)}`)
       } else {
         setError(result.error || '登録に失敗しました')
       }

@@ -18,10 +18,9 @@ const customJestConfig = {
     '<rootDir>/node_modules/', 
     '<rootDir>/e2e/',
     '<rootDir>/__tests__/helpers/',
-    '<rootDir>/src/app/api/',  // APIテストを一時的にスキップ
   ],
   transformIgnorePatterns: [
-    'node_modules/(?!(bson|mongodb)/)',
+    'node_modules/(?!(bson|mongodb|openid-client|jose)/)',
   ],
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',

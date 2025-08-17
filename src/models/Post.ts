@@ -4,7 +4,8 @@ export interface IPost {
   title: string;
   content: string;
   threadId: mongoose.Types.ObjectId;
-  author: string;
+  author: mongoose.Types.ObjectId;
+  authorName: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -33,9 +34,13 @@ const PostSchema = new Schema<IPostDocument>({
     required: true,
   },
   author: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  authorName: {
     type: String,
     required: true,
-    default: '匿名',
     maxlength: 50,
   },
 }, {

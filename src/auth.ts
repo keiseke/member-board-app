@@ -1,24 +1,25 @@
 // src/auth.ts
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
-import { MongoDBAdapter } from '@auth/mongodb-adapter'
-import { MongoClient } from 'mongodb'
+import GoogleProvider from 'next-auth/providers/google'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 import { connectDB } from '@/lib/mongodb'
 import { User } from '@/models/User'
-
-const client = new MongoClient(process.env.MONGODB_URI!)
 
 const loginSchema = z.object({
   email: z.string().email('正しいメールアドレスを入力してください'),
   password: z.string().min(6, 'パスワードは6文字以上で入力してください')
 })
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: MongoDBAdapter(client),
+export const authConfig = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET
+    }),
     Credentials({
+      id: 'credentials',
       name: 'credentials',
       credentials: {
         email: { label: 'メールアドレス', type: 'email' },
@@ -29,6 +30,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const validatedFields = loginSchema.safeParse(credentials)
 
           if (!validatedFields.success) {
+            console.log('バリデーションエラー:', validatedFields.error)
             return null
           }
 
@@ -38,17 +40,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const user = await User.findOne({ email }).select('+password')
 
           if (!user) {
+            console.log('ユーザーが見つかりません:', email)
             return null
           }
 
-          // メール認証チェック
           if (!user.emailVerified) {
+            console.log('メール認証が完了していません:', email)
             throw new Error('メール認証が完了していません')
           }
 
           const passwordsMatch = await bcrypt.compare(password, user.password)
 
           if (!passwordsMatch) {
+            console.log('パスワードが一致しません:', email)
             return null
           }
 
@@ -64,30 +68,59 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
       }
     })
+    
   ],
   pages: {
-    signIn: '/auth/login',
-    signUp: '/auth/register'
+    signIn: '/auth/login'
   },
   session: {
-    strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60 // 30日
+    strategy: 'jwt' as const,
+    maxAge: 30 * 24 * 60 * 60
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account, trigger, session: sessionData }) {
       if (user) {
         token.id = user.id
         token.emailVerified = user.emailVerified
       }
+      
+      // セッション更新時に最新のユーザー情報を取得
+      if (trigger === 'update' && sessionData?.user) {
+        try {
+          await connectDB()
+          const updatedUser = await User.findById(token.id || token.sub)
+          if (updatedUser) {
+            token.name = updatedUser.name
+            token.email = updatedUser.email
+          }
+        } catch (error) {
+          console.error('ユーザー情報更新エラー:', error)
+        }
+      }
+      
       return token
     },
     async session({ session, token }) {
-      if (token) {
+      if (token && session.user) {
         session.user.id = token.id as string
         session.user.emailVerified = token.emailVerified as boolean
+        session.user.name = token.name as string
+        session.user.email = token.email as string
+      }
+      if (token.sub) {
+        session.user.id = token.sub
+      }
+      if (token.role) {
+        session.user.role = token.role as string
       }
       return session
     }
   },
-  secret: process.env.NEXTAUTH_SECRET
-})
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: false,
+  trustHost: true
+}
+
+const nextAuth = NextAuth(authConfig)
+
+export const { signIn, signOut, auth } = nextAuth

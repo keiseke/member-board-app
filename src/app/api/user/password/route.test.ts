@@ -4,23 +4,18 @@ import { User } from '@/models/User'
 import { connectDB } from '@/lib/mongodb'
 import bcrypt from 'bcryptjs'
 
-// Next Auth のモック
-jest.mock('next-auth', () => ({
-  getServerSession: jest.fn()
-}))
-
-// Auth設定のモック
+// Auth のモック
 jest.mock('@/auth', () => ({
-  authOptions: {}
+  auth: jest.fn()
 }))
 
 jest.mock('@/models/User')
 jest.mock('@/lib/mongodb')
 jest.mock('bcryptjs')
 
-import { getServerSession } from 'next-auth'
+import { auth } from '@/auth'
 
-const mockGetServerSession = getServerSession as jest.MockedFunction<typeof getServerSession>
+const mockAuth = auth as jest.MockedFunction<typeof auth>
 const mockUser = User as jest.Mocked<typeof User>
 const mockConnectDB = connectDB as jest.MockedFunction<typeof connectDB>
 const mockBcrypt = bcrypt as jest.Mocked<typeof bcrypt>
@@ -32,7 +27,7 @@ describe('/api/user/password', () => {
 
   describe('PUT /api/user/password', () => {
     it('認証なしの場合401を返す', async () => {
-      mockGetServerSession.mockResolvedValue(null)
+      mockAuth.mockResolvedValue(null)
       const request = new NextRequest('http://localhost/api/user/password', {
         method: 'PUT',
         body: JSON.stringify({
@@ -50,7 +45,7 @@ describe('/api/user/password', () => {
     })
 
     it('新しいパスワードが6文字未満の場合400エラーを返す', async () => {
-      mockGetServerSession.mockResolvedValue({ user: { id: 'user123' } })
+      mockAuth.mockResolvedValue({ user: { id: 'user123' } })
       const request = new NextRequest('http://localhost/api/user/password', {
         method: 'PUT',
         body: JSON.stringify({
@@ -68,7 +63,7 @@ describe('/api/user/password', () => {
     })
 
     it('パスワード確認が一致しない場合400エラーを返す', async () => {
-      mockGetServerSession.mockResolvedValue({ user: { id: 'user123' } })
+      mockAuth.mockResolvedValue({ user: { id: 'user123' } })
       const request = new NextRequest('http://localhost/api/user/password', {
         method: 'PUT',
         body: JSON.stringify({
@@ -90,7 +85,7 @@ describe('/api/user/password', () => {
         password: 'hashedPassword'
       }
 
-      mockGetServerSession.mockResolvedValue({ user: { id: 'user123' } })
+      mockAuth.mockResolvedValue({ user: { id: 'user123' } })
       mockConnectDB.mockResolvedValue(undefined)
       mockUser.findById.mockReturnValue({
         select: jest.fn().mockResolvedValue(mockUserDoc)
@@ -118,7 +113,7 @@ describe('/api/user/password', () => {
         password: 'hashedPassword'
       }
 
-      mockGetServerSession.mockResolvedValue({ user: { id: 'user123' } })
+      mockAuth.mockResolvedValue({ user: { id: 'user123' } })
       mockConnectDB.mockResolvedValue(undefined)
       mockUser.findById.mockReturnValue({
         select: jest.fn().mockResolvedValue(mockUserDoc)
@@ -147,7 +142,7 @@ describe('/api/user/password', () => {
         save: jest.fn().mockResolvedValue(undefined)
       }
 
-      mockGetServerSession.mockResolvedValue({ user: { id: 'user123' } })
+      mockAuth.mockResolvedValue({ user: { id: 'user123' } })
       mockConnectDB.mockResolvedValue(undefined)
       mockUser.findById.mockReturnValue({
         select: jest.fn().mockResolvedValue(mockUserDoc)
@@ -175,7 +170,7 @@ describe('/api/user/password', () => {
     })
 
     it('ユーザーが見つからない場合404を返す', async () => {
-      mockGetServerSession.mockResolvedValue({ user: { id: 'user123' } })
+      mockAuth.mockResolvedValue({ user: { id: 'user123' } })
       mockConnectDB.mockResolvedValue(undefined)
       mockUser.findById.mockReturnValue({
         select: jest.fn().mockResolvedValue(null)

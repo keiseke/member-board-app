@@ -3,22 +3,17 @@ import { GET, PUT } from './route'
 import { User } from '@/models/User'
 import { connectDB } from '@/lib/mongodb'
 
-// Next Auth のモック
-jest.mock('next-auth', () => ({
-  getServerSession: jest.fn()
-}))
-
-// Auth設定のモック
+// Auth のモック
 jest.mock('@/auth', () => ({
-  authOptions: {}
+  auth: jest.fn()
 }))
 
 jest.mock('@/models/User')
 jest.mock('@/lib/mongodb')
 
-import { getServerSession } from 'next-auth'
+import { auth } from '@/auth'
 
-const mockGetServerSession = getServerSession as jest.MockedFunction<typeof getServerSession>
+const mockAuth = auth as jest.MockedFunction<typeof auth>
 const mockUser = User as jest.Mocked<typeof User>
 const mockConnectDB = connectDB as jest.MockedFunction<typeof connectDB>
 
@@ -29,7 +24,7 @@ describe('/api/user/profile', () => {
 
   describe('GET /api/user/profile', () => {
     it('認証なしの場合401を返す', async () => {
-      mockGetServerSession.mockResolvedValue(null)
+      mockAuth.mockResolvedValue(null)
 
       const response = await GET()
       const data = await response.json()
@@ -39,7 +34,7 @@ describe('/api/user/profile', () => {
     })
 
     it('ユーザーが見つからない場合404を返す', async () => {
-      mockGetServerSession.mockResolvedValue({ user: { id: 'user123' } })
+      mockAuth.mockResolvedValue({ user: { id: 'user123' } })
       mockConnectDB.mockResolvedValue(undefined)
       mockUser.findById.mockReturnValue({
         select: jest.fn().mockResolvedValue(null)
@@ -60,7 +55,7 @@ describe('/api/user/profile', () => {
         emailVerified: true
       }
 
-      mockGetServerSession.mockResolvedValue({ user: { id: 'user123' } })
+      mockAuth.mockResolvedValue({ user: { id: 'user123' } })
       mockConnectDB.mockResolvedValue(undefined)
       mockUser.findById.mockReturnValue({
         select: jest.fn().mockResolvedValue(mockUserData)
@@ -86,7 +81,7 @@ describe('/api/user/profile', () => {
         emailVerified: true
       }
 
-      mockGetServerSession.mockResolvedValue({ user: { id: 'user123' } })
+      mockAuth.mockResolvedValue({ user: { id: 'user123' } })
       mockConnectDB.mockResolvedValue(undefined)
       mockUser.findById.mockReturnValue({
         select: jest.fn().mockResolvedValue(mockUserData)
@@ -101,7 +96,7 @@ describe('/api/user/profile', () => {
 
   describe('PUT /api/user/profile', () => {
     it('認証なしの場合401を返す', async () => {
-      mockGetServerSession.mockResolvedValue(null)
+      mockAuth.mockResolvedValue(null)
       const request = new NextRequest('http://localhost/api/user/profile', {
         method: 'PUT',
         body: JSON.stringify({ name: 'テスト' })
@@ -115,7 +110,7 @@ describe('/api/user/profile', () => {
     })
 
     it('名前が空の場合400エラーを返す', async () => {
-      mockGetServerSession.mockResolvedValue({ user: { id: 'user123' } })
+      mockAuth.mockResolvedValue({ user: { id: 'user123' } })
       const request = new NextRequest('http://localhost/api/user/profile', {
         method: 'PUT',
         body: JSON.stringify({ name: '' })
@@ -129,7 +124,7 @@ describe('/api/user/profile', () => {
     })
 
     it('名前が50文字を超える場合400エラーを返す', async () => {
-      mockGetServerSession.mockResolvedValue({ user: { id: 'user123' } })
+      mockAuth.mockResolvedValue({ user: { id: 'user123' } })
       const longName = 'あ'.repeat(51)
       const request = new NextRequest('http://localhost/api/user/profile', {
         method: 'PUT',
@@ -144,7 +139,7 @@ describe('/api/user/profile', () => {
     })
 
     it('自己紹介が200文字を超える場合400エラーを返す', async () => {
-      mockGetServerSession.mockResolvedValue({ user: { id: 'user123' } })
+      mockAuth.mockResolvedValue({ user: { id: 'user123' } })
       const longBio = 'あ'.repeat(201)
       const request = new NextRequest('http://localhost/api/user/profile', {
         method: 'PUT',
@@ -167,7 +162,7 @@ describe('/api/user/profile', () => {
         save: jest.fn().mockResolvedValue(undefined)
       }
 
-      mockGetServerSession.mockResolvedValue({ user: { id: 'user123' } })
+      mockAuth.mockResolvedValue({ user: { id: 'user123' } })
       mockConnectDB.mockResolvedValue(undefined)
       mockUser.findById.mockResolvedValue(mockUserDoc)
 
@@ -190,7 +185,7 @@ describe('/api/user/profile', () => {
     })
 
     it('ユーザーが見つからない場合404を返す', async () => {
-      mockGetServerSession.mockResolvedValue({ user: { id: 'user123' } })
+      mockAuth.mockResolvedValue({ user: { id: 'user123' } })
       mockConnectDB.mockResolvedValue(undefined)
       mockUser.findById.mockResolvedValue(null)
 

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authConfig } from '@/auth'
+import { auth } from '@/auth'
 import { User } from '@/models/User'
 import { connectDB } from '@/lib/mongodb'
 import mongoose from 'mongoose'
@@ -11,7 +10,7 @@ export async function POST(request: NextRequest) {
   try {
     console.log('POST /api/user/avatar - 開始')
     
-    const session = await getServerSession(authConfig)
+    const session = await auth()
     console.log('取得したセッション:', session)
     
     if (!session?.user?.id) {
@@ -173,7 +172,7 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE() {
   try {
-    const session = await getServerSession(authConfig)
+    const session = await auth()
     
     if (!session?.user?.id) {
       return NextResponse.json(

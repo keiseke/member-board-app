@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authConfig } from '@/auth'
+import { auth } from '@/auth'
 import { User } from '@/models/User'
 import { connectDB } from '@/lib/mongodb'
 import bcrypt from 'bcryptjs'
@@ -17,7 +16,7 @@ const changePasswordSchema = z.object({
 
 export async function PUT(request: NextRequest) {
   try {
-    const session = await getServerSession(authConfig)
+    const session = await auth()
     
     if (!session?.user?.id) {
       return NextResponse.json(

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authConfig } from '@/auth'
+import { auth } from '@/auth'
 import { User } from '@/models/User'
 import { connectDB } from '@/lib/mongodb'
 import { z } from 'zod'
@@ -14,7 +13,7 @@ const updateProfileSchema = z.object({
 export async function GET() {
   try {
     console.log('プロフィール取得API開始')
-    const session = await getServerSession(authConfig)
+    const session = await auth()
     console.log('セッション取得:', session?.user?.id)
     
     if (!session?.user?.id) {
@@ -81,7 +80,7 @@ export async function PUT(request: NextRequest) {
   try {
     console.log('PUT /api/user/profile - 開始')
     
-    const session = await getServerSession(authConfig)
+    const session = await auth()
     console.log('取得したセッション:', session)
     
     if (!session?.user?.id) {

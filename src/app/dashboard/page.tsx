@@ -420,7 +420,13 @@ export default function DashboardPage() {
             open={isFormOpen}
             onClose={handleCloseForm}
             onSubmit={handleSubmitForm}
-            editingThread={editingThread}
+            editingThread={editingThread ? {
+              _id: editingThread._id,
+              title: editingThread.title,
+              description: editingThread.description,
+              category: editingThread.category,
+              creator: editingThread.creator.toString()
+            } : null}
           />
 
           <Snackbar

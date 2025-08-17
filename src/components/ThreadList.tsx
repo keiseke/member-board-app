@@ -67,7 +67,7 @@ const ThreadList: React.FC<ThreadListProps> = ({
   };
 
   const canEditThread = (thread: IThread & { _id: string }) => {
-    return thread.creator === currentUser;
+    return thread.creator?.toString() === currentUser;
   };
 
   return (

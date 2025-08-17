@@ -199,7 +199,7 @@ export default function ThreadPage() {
   };
 
   const canEditThread = () => {
-    return thread && session?.user?.id && thread.creator === session.user.id;
+    return thread && session?.user?.id && thread.creator?.toString() === session.user.id;
   };
 
   const handleUpdatePost = async (data: { title: string; content: string; author?: string }) => {

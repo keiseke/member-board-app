@@ -1,20 +1,34 @@
 // src/lib/mongodb.ts
 import mongoose from 'mongoose'
 
-const MONGODB_URI = process.env.MONGODB_URI!
+const MONGODB_URI = process.env.MONGODB_URI
 
 if (!MONGODB_URI) {
   throw new Error('MONGODB_URI 環境変数が設定されていません')
 }
 
 // グローバル変数でMongoose接続をキャッシュ
-let cached = (global as any).mongoose
-
-if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null }
+interface CachedConnection {
+  conn: typeof mongoose | null
+  promise: Promise<typeof mongoose> | null
 }
 
-export async function connectDB() {
+interface GlobalMongoose {
+  mongoose?: CachedConnection
+}
+
+declare global {
+  // eslint-disable-next-line no-var
+  var mongoose: CachedConnection | undefined
+}
+
+let cached: CachedConnection = global.mongoose as CachedConnection
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null }
+}
+
+async function connectDB() {
   if (cached.conn) {
     return cached.conn
   }
@@ -38,3 +52,5 @@ export async function connectDB() {
 
   return cached.conn
 }
+
+export { connectDB }

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authConfig } from '@/auth'
 import { User } from '@/models/User'
-import { connectDB } from '@/lib/mongodb.js'
+import { connectDB } from '@/lib/mongodb'
 import mongoose from 'mongoose'
 
 export const runtime = 'nodejs'
@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function DELETE(request: NextRequest) {
+export async function DELETE() {
   try {
     const session = await getServerSession(authConfig)
     

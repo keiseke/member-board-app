@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authConfig } from '@/auth'
 import { User } from '@/models/User'
-import { connectDB } from '@/lib/mongodb.js'
+import { connectDB } from '@/lib/mongodb'
 import { z } from 'zod'
+import mongoose from 'mongoose'
 
 const updateProfileSchema = z.object({
   name: z.string().min(1, '名前を入力してください').max(50, '名前は50文字以内で入力してください'),
@@ -42,7 +43,6 @@ export async function GET() {
     }
 
     // ネイティブMongoDBでも確認
-    const mongoose = require('mongoose')
     const db = mongoose.connection.db
     const usersCollection = db.collection('users')
     const nativeUser = await usersCollection.findOne({ _id: new mongoose.Types.ObjectId(session.user.id) })

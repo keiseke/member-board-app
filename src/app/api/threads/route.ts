@@ -10,7 +10,7 @@ const threadSchema = z.object({
   category: z.string().min(1, 'カテゴリーを選択してください').max(50, 'カテゴリーは50文字以内で入力してください')
 });
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     await connectDB();
     const threads = await Thread.find({})

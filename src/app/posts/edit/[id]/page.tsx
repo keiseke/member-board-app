@@ -23,13 +23,11 @@ import {
   Select,
   MenuItem as SelectMenuItem
 } from '@mui/material'
-import {
-  AccountCircle,
-  Save as SaveIcon,
-  Cancel as CancelIcon,
-  ExitToApp as LogoutIcon,
-  ArrowBack as ArrowBackIcon
-} from '@mui/icons-material'
+import AccountCircle from '@mui/icons-material/AccountCircle'
+import SaveIcon from '@mui/icons-material/Save'
+import CancelIcon from '@mui/icons-material/Cancel'
+import LogoutIcon from '@mui/icons-material/ExitToApp'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'

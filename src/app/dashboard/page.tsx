@@ -22,7 +22,10 @@ import {
   MenuItem,
   Button,
 } from '@mui/material'
-import { Add, AccountCircle, Login, Logout } from '@mui/icons-material'
+import Add from '@mui/icons-material/Add'
+import AccountCircle from '@mui/icons-material/AccountCircle'
+import Login from '@mui/icons-material/Login'
+import Logout from '@mui/icons-material/Logout'
 import ThreadList from '@/components/ThreadList'
 import dynamic from 'next/dynamic'
 

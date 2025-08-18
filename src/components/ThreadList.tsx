@@ -12,7 +12,12 @@ import {
   Menu,
   MenuItem,
 } from '@mui/material';
-import { Forum, AccessTime, Person, MoreVert, Edit, Delete } from '@mui/icons-material';
+import Forum from '@mui/icons-material/Forum';
+import AccessTime from '@mui/icons-material/AccessTime';
+import Person from '@mui/icons-material/Person';
+import MoreVert from '@mui/icons-material/MoreVert';
+import Edit from '@mui/icons-material/Edit';
+import Delete from '@mui/icons-material/Delete';
 import { IThread } from '@/models/Thread';
 
 interface ThreadListProps {

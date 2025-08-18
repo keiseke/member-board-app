@@ -22,7 +22,14 @@ import {
   AppBar,
   Toolbar,
 } from '@mui/material';
-import { Add, ArrowBack, Forum, MoreVert, Edit, Delete, AccountCircle, ExitToApp as LogoutIcon } from '@mui/icons-material';
+import Add from '@mui/icons-material/Add';
+import ArrowBack from '@mui/icons-material/ArrowBack';
+import Forum from '@mui/icons-material/Forum';
+import MoreVert from '@mui/icons-material/MoreVert';
+import Edit from '@mui/icons-material/Edit';
+import Delete from '@mui/icons-material/Delete';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import LogoutIcon from '@mui/icons-material/ExitToApp';
 import { signOut } from 'next-auth/react';
 import PostForm from '@/components/PostForm';
 import ThreadForm from '@/components/ThreadForm';

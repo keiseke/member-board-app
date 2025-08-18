@@ -26,19 +26,17 @@ import {
   DialogActions,
   Divider
 } from '@mui/material'
-import {
-  AccountCircle,
-  Edit as EditIcon,
-  Save as SaveIcon,
-  Cancel as CancelIcon,
-  ExitToApp as LogoutIcon,
-  ArrowBack as ArrowBackIcon,
-  Lock as LockIcon,
-  Visibility,
-  VisibilityOff,
-  PhotoCamera,
-  Delete as DeleteIcon
-} from '@mui/icons-material'
+import AccountCircle from '@mui/icons-material/AccountCircle'
+import EditIcon from '@mui/icons-material/Edit'
+import SaveIcon from '@mui/icons-material/Save'
+import CancelIcon from '@mui/icons-material/Cancel'
+import LogoutIcon from '@mui/icons-material/ExitToApp'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import LockIcon from '@mui/icons-material/Lock'
+import Visibility from '@mui/icons-material/Visibility'
+import VisibilityOff from '@mui/icons-material/VisibilityOff'
+import PhotoCamera from '@mui/icons-material/PhotoCamera'
+import DeleteIcon from '@mui/icons-material/Delete'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'

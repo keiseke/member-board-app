@@ -26,7 +26,7 @@ import {
   DialogActions,
   Divider
 } from '@mui/material'
-// Material-UI Core Icons that are guaranteed to exist
+// Material-UI Core Icons - using only the most basic icons
 import AccountCircle from '@mui/icons-material/AccountCircle'
 import Edit from '@mui/icons-material/Edit'
 import Check from '@mui/icons-material/Check'
@@ -34,12 +34,11 @@ import Close from '@mui/icons-material/Close'
 import Logout from '@mui/icons-material/Logout'
 import ArrowBack from '@mui/icons-material/ArrowBack'
 import Lock from '@mui/icons-material/Lock'
-import Visibility from '@mui/icons-material/Visibility'
-import VisibilityOff from '@mui/icons-material/VisibilityOff'
-import PhotoCamera from '@mui/icons-material/PhotoCamera'
 import Delete from '@mui/icons-material/Delete'
 
-// Alias for component usage
+// Visibility icons no longer needed - using text buttons instead
+
+// Aliases for existing icons
 const EditIcon = Edit
 const SaveIcon = Check
 const CancelIcon = Close
@@ -384,7 +383,7 @@ export default function ProfilePage() {
                         '&:hover': { backgroundColor: 'grey.100' }
                       }}
                     >
-                      <PhotoCamera fontSize="small" />
+                      📷
                     </IconButton>
                   </label>
                   {profileData.avatarUrl && (
@@ -600,12 +599,12 @@ export default function ProfilePage() {
                     helperText={passwordErrors.currentPassword?.message}
                     InputProps={{
                       endAdornment: (
-                        <IconButton
+                        <Button
+                          size="small"
                           onClick={() => togglePasswordVisibility('current')}
-                          edge="end"
                         >
-                          {showPasswords.current ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
+                          {showPasswords.current ? '隠す' : '表示'}
+                        </Button>
                       )
                     }}
                   />
@@ -622,12 +621,12 @@ export default function ProfilePage() {
                     helperText={passwordErrors.newPassword?.message || '6文字以上で入力してください'}
                     InputProps={{
                       endAdornment: (
-                        <IconButton
+                        <Button
+                          size="small"
                           onClick={() => togglePasswordVisibility('new')}
-                          edge="end"
                         >
-                          {showPasswords.new ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
+                          {showPasswords.new ? '隠す' : '表示'}
+                        </Button>
                       )
                     }}
                   />
@@ -644,12 +643,12 @@ export default function ProfilePage() {
                     helperText={passwordErrors.confirmPassword?.message}
                     InputProps={{
                       endAdornment: (
-                        <IconButton
+                        <Button
+                          size="small"
                           onClick={() => togglePasswordVisibility('confirm')}
-                          edge="end"
                         >
-                          {showPasswords.confirm ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
+                          {showPasswords.confirm ? '隠す' : '表示'}
+                        </Button>
                       )
                     }}
                   />

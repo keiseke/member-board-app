@@ -29,7 +29,9 @@ import MoreVert from '@mui/icons-material/MoreVert';
 import Edit from '@mui/icons-material/Edit';
 import Delete from '@mui/icons-material/Delete';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import LogoutIcon from '@mui/icons-material/ExitToApp';
+import Logout from '@mui/icons-material/Logout';
+
+const LogoutIcon = Logout
 import { signOut } from 'next-auth/react';
 import PostForm from '@/components/PostForm';
 import ThreadForm from '@/components/ThreadForm';

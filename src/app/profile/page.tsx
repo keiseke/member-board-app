@@ -26,17 +26,27 @@ import {
   DialogActions,
   Divider
 } from '@mui/material'
+// Material-UI Core Icons that are guaranteed to exist
 import AccountCircle from '@mui/icons-material/AccountCircle'
-import EditIcon from '@mui/icons-material/Edit'
-import SaveIcon from '@mui/icons-material/Save'
-import CancelIcon from '@mui/icons-material/Cancel'
-import LogoutIcon from '@mui/icons-material/ExitToApp'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import LockIcon from '@mui/icons-material/Lock'
+import Edit from '@mui/icons-material/Edit'
+import Check from '@mui/icons-material/Check'
+import Close from '@mui/icons-material/Close'
+import Logout from '@mui/icons-material/Logout'
+import ArrowBack from '@mui/icons-material/ArrowBack'
+import Lock from '@mui/icons-material/Lock'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import PhotoCamera from '@mui/icons-material/PhotoCamera'
-import DeleteIcon from '@mui/icons-material/Delete'
+import Delete from '@mui/icons-material/Delete'
+
+// Alias for component usage
+const EditIcon = Edit
+const SaveIcon = Check
+const CancelIcon = Close
+const LogoutIcon = Logout
+const ArrowBackIcon = ArrowBack
+const LockIcon = Lock
+const DeleteIcon = Delete
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'

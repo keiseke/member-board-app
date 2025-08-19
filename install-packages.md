@@ -1,49 +1,50 @@
-# パッケージインストールコマンド
+# 会員制掲示板システム - 必要パッケージインストール
 
-## 必要なパッケージの一括インストール
+## 追加で必要なパッケージ
 
 ```bash
-# メイン依存関係
-npm install next@15 react@19 react-dom@19
-npm install next-auth@beta
-npm install mongodb mongoose
-npm install @mui/material @emotion/react @emotion/styled
-npm install @mui/icons-material
-npm install @mui/x-date-pickers
-npm install nodemailer
-npm install bcryptjs
-npm install zod
-npm install react-hook-form @hookform/resolvers
+# NextAuth v5とその他の認証関連
+npm install next-auth@beta bcryptjs crypto-js @next-auth/mongodb-adapter
+
+# フォーム処理とバリデーション
+npm install zod react-hook-form @hookform/resolvers
+
+# 日付処理
 npm install dayjs
 
-# 開発依存関係
-npm install --save-dev @types/node @types/react @types/react-dom
-npm install --save-dev @types/bcryptjs @types/nodemailer
-npm install --save-dev typescript
-npm install --save-dev eslint eslint-config-next
+# 型定義
+npm install --save-dev @types/bcryptjs @types/crypto-js
 ```
 
-## 個別インストールコマンド（お好みで）
+## 既にインストール済みのパッケージ
+- Next.js 15.4.4 ✅
+- React 19.1.0 ✅ 
+- MUI (Material-UI) 7.2.0 ✅
+- MongoDB (Mongoose) 8.17.0 ✅
+- Nodemailer 7.0.5 ✅
+- TypeScript ✅
+- TailwindCSS ✅
 
-```bash
-# フレームワーク
-npm install next@15 react@19 react-dom@19
+## 環境変数設定
 
-# 認証
-npm install next-auth@beta
+`.env.local` ファイルに以下を設定してください：
 
-# データベース
-npm install mongodb mongoose
+```env
+# NextAuth
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-secret-here
 
-# UI フレームワーク
-npm install @mui/material @emotion/react @emotion/styled @mui/icons-material @mui/x-date-pickers
+# MongoDB
+MONGODB_URI=mongodb://localhost:27017/member-board
 
-# ユーティリティ
-npm install nodemailer bcryptjs zod react-hook-form @hookform/resolvers dayjs
+# Email (SMTP)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password
 
-# TypeScript関連
-npm install --save-dev @types/node @types/react @types/react-dom @types/bcryptjs @types/nodemailer typescript
-
-# 開発ツール
-npm install --save-dev eslint eslint-config-next
+# From Email
+FROM_EMAIL=your-email@gmail.com
+FROM_NAME=Member Board System
 ```

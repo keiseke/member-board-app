@@ -9,7 +9,7 @@ import {
   Box,
   Button,
   TextField,
-  Grid,
+  Grid2 as Grid,
   Avatar,
   CircularProgress,
   Alert,
@@ -458,7 +458,7 @@ export default function ProfilePage() {
 
             <form onSubmit={handleSubmit(onSubmit)}>
               <Grid container spacing={3}>
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <Controller
                     name="name"
                     control={control}
@@ -476,7 +476,7 @@ export default function ProfilePage() {
                   />
                 </Grid>
                 
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <Controller
                     name="bio"
                     control={control}
@@ -496,7 +496,7 @@ export default function ProfilePage() {
                   />
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <TextField
                     label="メールアドレス"
                     fullWidth
@@ -507,7 +507,7 @@ export default function ProfilePage() {
                   />
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <TextField
                     label="ユーザーID"
                     fullWidth
@@ -518,7 +518,7 @@ export default function ProfilePage() {
                   />
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <TextField
                     label="メール認証状態"
                     fullWidth
@@ -529,7 +529,7 @@ export default function ProfilePage() {
                   />
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <Divider sx={{ my: 2 }} />
                   <Box display="flex" gap={2} justifyContent="space-between">
                     <Button
@@ -588,7 +588,7 @@ export default function ProfilePage() {
           <form onSubmit={handleSubmitPassword(onPasswordSubmit)}>
             <DialogContent>
               <Grid container spacing={3}>
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <TextField
                     {...registerPassword('currentPassword')}
                     label="現在のパスワード"
@@ -610,7 +610,7 @@ export default function ProfilePage() {
                   />
                 </Grid>
                 
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <TextField
                     {...registerPassword('newPassword')}
                     label="新しいパスワード"
@@ -632,7 +632,7 @@ export default function ProfilePage() {
                   />
                 </Grid>
                 
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <TextField
                     {...registerPassword('confirmPassword')}
                     label="パスワード確認"

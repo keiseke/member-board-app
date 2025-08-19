@@ -39,7 +39,7 @@ const PostForm: React.FC<PostFormProps> = ({
     if (editingPost) {
       setTitle(editingPost.title);
       setContent(editingPost.content);
-      setAuthor(editingPost.author || '');
+      setAuthor(editingPost.author?.toString() || '');
       setContentLength(editingPost.content.length);
     } else {
       setTitle('');

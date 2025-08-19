@@ -40,3 +40,21 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Windows
+nul
+Thumbs.db
+Desktop.ini
+
+# Test files (exclude from production)
+__tests__/
+e2e/
+/test-results/
+/playwright-report/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+jest.config.js
+jest.setup.js
+playwright.config.ts

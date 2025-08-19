@@ -166,7 +166,7 @@ export default function ProfilePage() {
       }
       
       setSuccess('プロフィールを更新しました')
-      setProfileData(data)
+      setProfileData(prev => ({ ...prev, ...data }))
       setIsEditing(false)
       
       // セッション情報を更新

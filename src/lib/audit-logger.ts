@@ -183,7 +183,7 @@ export class AuditLogger {
       .sort({ timestamp: -1 })
       .limit(filters.limit || 100)
       .skip(filters.offset || 0)
-      .lean()
+      .exec() as AuditLogDocument[]
   }
 
   /**

@@ -9,7 +9,7 @@ import {
   Box,
   Button,
   TextField,
-  Grid2 as Grid,
+  Grid,
   Avatar,
   CircularProgress,
   Alert,
@@ -457,8 +457,8 @@ export default function ProfilePage() {
 
 
             <form onSubmit={handleSubmit(onSubmit)}>
-              <Grid container spacing={3}>
-                <Grid size={12}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <Box>
                   <Controller
                     name="name"
                     control={control}
@@ -474,9 +474,9 @@ export default function ProfilePage() {
                       />
                     )}
                   />
-                </Grid>
+                </Box>
                 
-                <Grid size={12}>
+                <Box>
                   <Controller
                     name="bio"
                     control={control}
@@ -494,9 +494,9 @@ export default function ProfilePage() {
                       />
                     )}
                   />
-                </Grid>
+                </Box>
 
-                <Grid size={12}>
+                <Box>
                   <TextField
                     label="メールアドレス"
                     fullWidth
@@ -505,9 +505,9 @@ export default function ProfilePage() {
                     disabled
                     helperText="メールアドレスは変更できません"
                   />
-                </Grid>
+                </Box>
 
-                <Grid size={12}>
+                <Box>
                   <TextField
                     label="ユーザーID"
                     fullWidth
@@ -516,9 +516,9 @@ export default function ProfilePage() {
                     disabled
                     helperText="ユーザーIDは変更できません"
                   />
-                </Grid>
+                </Box>
 
-                <Grid size={12}>
+                <Box>
                   <TextField
                     label="メール認証状態"
                     fullWidth
@@ -527,9 +527,9 @@ export default function ProfilePage() {
                     disabled
                     helperText="メール認証の状態です"
                   />
-                </Grid>
+                </Box>
 
-                <Grid size={12}>
+                <Box>
                   <Divider sx={{ my: 2 }} />
                   <Box display="flex" gap={2} justifyContent="space-between">
                     <Button
@@ -572,8 +572,8 @@ export default function ProfilePage() {
                       )}
                     </Box>
                   </Box>
-                </Grid>
-              </Grid>
+                </Box>
+              </Box>
             </form>
           </CardContent>
         </Card>
@@ -587,8 +587,8 @@ export default function ProfilePage() {
           <DialogTitle>パスワード変更</DialogTitle>
           <form onSubmit={handleSubmitPassword(onPasswordSubmit)}>
             <DialogContent>
-              <Grid container spacing={3}>
-                <Grid size={12}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <Box>
                   <TextField
                     {...registerPassword('currentPassword')}
                     label="現在のパスワード"
@@ -608,9 +608,9 @@ export default function ProfilePage() {
                       )
                     }}
                   />
-                </Grid>
+                </Box>
                 
-                <Grid size={12}>
+                <Box>
                   <TextField
                     {...registerPassword('newPassword')}
                     label="新しいパスワード"
@@ -630,9 +630,9 @@ export default function ProfilePage() {
                       )
                     }}
                   />
-                </Grid>
+                </Box>
                 
-                <Grid size={12}>
+                <Box>
                   <TextField
                     {...registerPassword('confirmPassword')}
                     label="パスワード確認"
@@ -652,8 +652,8 @@ export default function ProfilePage() {
                       )
                     }}
                   />
-                </Grid>
-              </Grid>
+                </Box>
+              </Box>
             </DialogContent>
             <DialogActions>
               <Button 

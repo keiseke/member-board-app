@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { usePermissions } from '@/hooks/usePermissions';
 import {
   Card,
   CardContent,
@@ -11,7 +12,12 @@ import {
   Menu,
   MenuItem,
 } from '@mui/material';
-import { Forum, AccessTime, Person, MoreVert, Edit, Delete } from '@mui/icons-material';
+import Forum from '@mui/icons-material/Forum';
+import AccessTime from '@mui/icons-material/AccessTime';
+import Person from '@mui/icons-material/Person';
+import MoreVert from '@mui/icons-material/MoreVert';
+import Edit from '@mui/icons-material/Edit';
+import Delete from '@mui/icons-material/Delete';
 import { IThread } from '@/models/Thread';
 
 interface ThreadListProps {
@@ -31,6 +37,7 @@ const ThreadList: React.FC<ThreadListProps> = ({
 }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedThread, setSelectedThread] = React.useState<(IThread & { _id: string }) | null>(null);
+  const permissions = usePermissions();
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString('ja-JP', {
@@ -67,7 +74,7 @@ const ThreadList: React.FC<ThreadListProps> = ({
   };
 
   const canEditThread = (thread: IThread & { _id: string }) => {
-    return thread.creator === currentUser;
+    return permissions.canEdit(thread.creator);
   };
 
   return (
@@ -167,7 +174,7 @@ const ThreadList: React.FC<ThreadListProps> = ({
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <Person fontSize="small" />
                   <Typography variant="caption">
-                    {thread.creator}
+                    {thread.creatorName}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>

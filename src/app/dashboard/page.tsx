@@ -1,337 +1,453 @@
-// src/app/dashboard/page.tsx
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { useSession, signIn, signOut } from 'next-auth/react'
 import {
   Container,
   Typography,
   Box,
-  Paper,
-  Button,
-  Card,
-  CardContent,
-  CardActions,
-  Grid,
   Fab,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  DialogActions,
-  Chip,
-  Pagination,
-  CircularProgress,
+  ThemeProvider,
+  createTheme,
+  CssBaseline,
   Alert,
+  Snackbar,
+  Tabs,
+  Tab,
   AppBar,
   Toolbar,
   IconButton,
   Menu,
-  MenuItem
+  MenuItem,
+  Button,
 } from '@mui/material'
-import {
-  Add as AddIcon,
-  AccountCircle,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  ExitToApp as LogoutIcon
-} from '@mui/icons-material'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import dayjs from 'dayjs'
+import Add from '@mui/icons-material/Add'
+import AccountCircle from '@mui/icons-material/AccountCircle'
+import Login from '@mui/icons-material/Login'
+import Logout from '@mui/icons-material/Logout'
+import ThreadList from '@/components/ThreadList'
+import dynamic from 'next/dynamic'
 
-const postSchema = z.object({
-  title: z.string().min(1, 'タイトルを入力してください').max(200, 'タイトルは200文字以内で入力してください'),
-  content: z.string().min(1, '内容を入力してください').max(5000, '内容は5000文字以内で入力してください')
+// Dynamic import for ThreadForm - 遅延読み込みで初回読み込み時間を短縮
+const ThreadForm = dynamic(() => import('@/components/ThreadForm'), {
+  loading: () => <Box sx={{ p: 2, textAlign: 'center' }}>フォームを読み込んでいます...</Box>,
+  ssr: false,
+})
+import { IThread } from '@/models/Thread'
+
+const categories = [
+  '全て',
+  '一般',
+  '政治',
+  '経済',
+  'テクノロジー',
+  'スポーツ',
+  'エンターテイメント',
+  '趣味',
+  '質問',
+  'その他',
+]
+
+const theme = createTheme({
+  palette: {
+    mode: 'light',
+    primary: {
+      main: '#ec4899',
+      light: '#f9a8d4',
+      dark: '#be185d',
+    },
+    secondary: {
+      main: '#f3e8ff',
+      light: '#fdf2f8',
+      dark: '#a855f7',
+    },
+    background: {
+      default: '#fdf2f8',
+      paper: '#fce7f3',
+    },
+  },
 })
 
-type PostFormData = z.infer<typeof postSchema>
-
-interface Post {
-  _id: string
-  title: string
-  content: string
-  author: string
-  authorName: string
-  createdAt: string
-  updatedAt: string
-}
-
 export default function DashboardPage() {
-  const { data: session, status } = useSession()
   const router = useRouter()
-  
-  const [posts, setPosts] = useState<Post[]>([])
-  const [loading, setLoading] = useState(true)
-  const [page, setPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [open, setOpen] = useState(false)
-  const [editingPost, setEditingPost] = useState<Post | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    setValue
-  } = useForm<PostFormData>({
-    resolver: zodResolver(postSchema)
+  const { data: session, status } = useSession()
+  const [threads, setThreads] = useState<(IThread & { _id: string })[]>([])
+  const [filteredThreads, setFilteredThreads] = useState<(IThread & { _id: string })[]>([])
+  const [selectedCategory, setSelectedCategory] = useState(0) // 0 = '全て'
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [editingThread, setEditingThread] = useState<(IThread & { _id: string }) | null>(null)
+  const [currentUser, setCurrentUser] = useState('匿名') // TODO: 実際のユーザー管理を実装する場合はここを変更
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
+    open: false,
+    message: '',
+    severity: 'success',
   })
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const [userProfile, setUserProfile] = useState<{ name: string } | null>(null)
 
-  // 投稿一覧取得
-  const fetchPosts = async (pageNum = 1) => {
+  // ユーザープロフィール取得
+  const fetchUserProfile = async () => {
     try {
-      setLoading(true)
-      const response = await fetch(`/api/posts?page=${pageNum}&limit=10`)
-      const data = await response.json()
-      
+      const response = await fetch('/api/user/profile')
       if (response.ok) {
-        setPosts(data.posts)
-        setTotalPages(data.pagination.totalPages)
-      } else {
-        setError(data.error || '投稿の取得に失敗しました')
+        const data = await response.json()
+        setUserProfile({ name: data.name })
       }
     } catch (err) {
-      setError('サーバーエラーが発生しました')
-    } finally {
-      setLoading(false)
+      console.error('プロフィール取得エラー:', err)
+    }
+  }
+
+  const fetchThreads = async () => {
+    try {
+      const response = await fetch('/api/threads')
+      if (response.ok) {
+        const data = await response.json()
+        setThreads(data)
+      } else if (response.status === 401) {
+        // 認証が必要な場合は空の配列を設定
+        setThreads([])
+        console.log('認証が必要です - ログインしてください')
+      } else {
+        console.error('スレッドの取得に失敗しました:', response.status)
+      }
+    } catch (error) {
+      console.error('スレッドの取得エラー:', error)
+      showSnackbar('スレッドの取得に失敗しました', 'error')
+    }
+  }
+
+  const filterThreadsByCategory = (categoryIndex: number) => {
+    if (categoryIndex === 0) {
+      // '全て'が選択された場合
+      setFilteredThreads(threads)
+    } else {
+      const selectedCategoryName = categories[categoryIndex]
+      const filtered = threads.filter(thread => thread.category === selectedCategoryName)
+      setFilteredThreads(filtered)
     }
   }
 
   useEffect(() => {
+    filterThreadsByCategory(selectedCategory)
+  }, [threads, selectedCategory])
+
+  useEffect(() => {
+    // セッション状態に関係なく、常にスレッドを取得する
+    fetchThreads()
+    
+    // ログインしている場合のみユーザープロフィールを取得
     if (status === 'authenticated') {
-      fetchPosts(page)
+      fetchUserProfile()
     }
-  }, [status, page])
+  }, [status])
 
-  // 投稿作成・更新
-  const onSubmit = async (data: PostFormData) => {
+  // ページがフォーカスされた時にプロフィールを再取得
+  useEffect(() => {
+    const handleFocus = () => {
+      if (status === 'authenticated') {
+        fetchUserProfile()
+      }
+    }
+
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
+  }, [status])
+
+  const showSnackbar = (message: string, severity: 'success' | 'error') => {
+    setSnackbar({ open: true, message, severity })
+  }
+
+  const handleCreateThread = async (data: { title: string; description: string; category: string; creator?: string }) => {
+    // ログインしていない場合はログイン画面に遷移
+    if (!session) {
+      router.push('/auth/login')
+      return
+    }
+
     try {
-      const url = editingPost ? `/api/posts/${editingPost._id}` : '/api/posts'
-      const method = editingPost ? 'PUT' : 'POST'
-      
-      const response = await fetch(url, {
-        method,
+      const response = await fetch('/api/threads', {
+        method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+          ...data,
+          creator: data.creator || currentUser,
+        }),
       })
 
-      const result = await response.json()
-
       if (response.ok) {
-        setOpen(false)
-        setEditingPost(null)
-        reset()
-        fetchPosts(page)
+        fetchThreads()
+        showSnackbar('スレッドを作成しました', 'success')
       } else {
-        setError(result.error || '投稿の保存に失敗しました')
+        const error = await response.json()
+        showSnackbar(error.error || 'スレッドの作成に失敗しました', 'error')
       }
-    } catch (err) {
-      setError('サーバーエラーが発生しました')
+    } catch (error) {
+      showSnackbar('スレッドの作成に失敗しました', 'error')
     }
   }
 
-  // 投稿削除
-  const handleDelete = async (postId: string) => {
-    if (!confirm('この投稿を削除しますか？')) return
+  const handleUpdateThread = async (data: { title: string; description: string; category: string; creator?: string }) => {
+    if (!editingThread) return
 
     try {
-      const response = await fetch(`/api/posts/${postId}`, {
-        method: 'DELETE'
+      const response = await fetch(`/api/threads/${editingThread._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
       })
 
       if (response.ok) {
-        fetchPosts(page)
+        fetchThreads()
+        setEditingThread(null)
+        showSnackbar('スレッドを更新しました', 'success')
       } else {
-        const result = await response.json()
-        setError(result.error || '投稿の削除に失敗しました')
+        const error = await response.json()
+        showSnackbar(error.error || 'スレッドの更新に失敗しました', 'error')
       }
-    } catch (err) {
-      setError('サーバーエラーが発生しました')
+    } catch (error) {
+      showSnackbar('スレッドの更新に失敗しました', 'error')
     }
   }
 
-  // 編集開始
-  const handleEdit = (post: Post) => {
-    setEditingPost(post)
-    setValue('title', post.title)
-    setValue('content', post.content)
-    setOpen(true)
+  const handleDeleteThread = async (threadId: string) => {
+    if (!confirm('このスレッドを削除しますか？関連する投稿も全て削除されます。')) return
+
+    try {
+      const response = await fetch(`/api/threads/${threadId}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        fetchThreads()
+        showSnackbar('スレッドを削除しました', 'success')
+      } else {
+        const error = await response.json()
+        showSnackbar(error.error || 'スレッドの削除に失敗しました', 'error')
+      }
+    } catch (error) {
+      showSnackbar('スレッドの削除に失敗しました', 'error')
+    }
   }
 
-  // 新規投稿
-  const handleNewPost = () => {
-    setEditingPost(null)
-    reset()
-    setOpen(true)
+  const handleThreadClick = (threadId: string) => {
+    // ログインしていない場合はログイン画面に遷移
+    if (!session) {
+      router.push('/auth/login')
+      return
+    }
+    router.push(`/thread/${threadId}`)
   }
 
-  if (status === 'loading') {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-        <CircularProgress />
-      </Box>
-    )
+  const handleCategoryChange = (event: React.SyntheticEvent, newValue: number) => {
+    setSelectedCategory(newValue)
+  }
+
+  const handleEditThread = (thread: IThread & { _id: string }) => {
+    setEditingThread(thread)
+    setIsFormOpen(true)
+  }
+
+  const handleCloseForm = () => {
+    setIsFormOpen(false)
+    setEditingThread(null)
+  }
+
+  const handleSubmitForm = (data: { title: string; description: string; category: string; creator?: string }) => {
+    if (editingThread) {
+      handleUpdateThread(data)
+    } else {
+      handleCreateThread(data)
+    }
+  }
+
+  const handleFabClick = () => {
+    // ログインしていない場合はログイン画面に遷移
+    if (!session) {
+      router.push('/auth/login')
+      return
+    }
+    setIsFormOpen(true)
   }
 
   return (
-    <>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            会員制掲示板
-          </Typography>
-          <IconButton
-            color="inherit"
-            onClick={(e) => setAnchorEl(e.currentTarget)}
-          >
-            <AccountCircle />
-          </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={() => setAnchorEl(null)}
-          >
-            <MenuItem onClick={() => signOut()}>
-              <LogoutIcon sx={{ mr: 1 }} />
-              ログアウト
-            </MenuItem>
-          </Menu>
-        </Toolbar>
-      </AppBar>
-
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-          <Typography variant="h4" component="h1">
-            ようこそ、{session?.user?.name}さん
-          </Typography>
-        </Box>
-
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
-            {error}
-          </Alert>
-        )}
-
-        {loading ? (
-          <Box display="flex" justifyContent="center" my={4}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <>
-            <Grid container spacing={3}>
-              {posts.map((post) => (
-                <Grid item xs={12} md={6} key={post._id}>
-                  <Card>
-                    <CardContent>
-                      <Typography variant="h6" component="h2" gutterBottom>
-                        {post.title}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" paragraph>
-                        {post.content.length > 100 
-                          ? `${post.content.substring(0, 100)}...` 
-                          : post.content}
-                      </Typography>
-                      <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Chip
-                          label={post.authorName}
-                          size="small"
-                          variant="outlined"
-                        />
-                        <Typography variant="caption" color="text.secondary">
-                          {dayjs(post.createdAt).format('YYYY/MM/DD HH:mm')}
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                    {post.author === session?.user?.id && (
-                      <CardActions>
-                        <Button
-                          size="small"
-                          startIcon={<EditIcon />}
-                          onClick={() => handleEdit(post)}
-                        >
-                          編集
-                        </Button>
-                        <Button
-                          size="small"
-                          color="error"
-                          startIcon={<DeleteIcon />}
-                          onClick={() => handleDelete(post._id)}
-                        >
-                          削除
-                        </Button>
-                      </CardActions>
-                    )}
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-
-            {totalPages > 1 && (
-              <Box display="flex" justifyContent="center" mt={4}>
-                <Pagination
-                  count={totalPages}
-                  page={page}
-                  onChange={(_, newPage) => setPage(newPage)}
-                  color="primary"
-                />
-              </Box>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Box
+        sx={{
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #f9a8d4 100%)',
+        }}
+      >
+        <AppBar position="static" sx={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)' }}>
+          <Toolbar>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: '#1565c0', fontWeight: 700 }}>
+              💬 掲示板
+            </Typography>
+            {status === 'loading' ? (
+              <Typography variant="body2" sx={{ color: '#1565c0' }}>
+                読み込み中...
+              </Typography>
+            ) : session ? (
+              <>
+                <Typography variant="body2" sx={{ mr: 2, color: '#1565c0' }}>
+                  ようこそ、{userProfile?.name || session.user?.name}さん
+                </Typography>
+                <IconButton
+                  color="inherit"
+                  onClick={(e) => setAnchorEl(e.currentTarget)}
+                  sx={{ color: '#1565c0' }}
+                >
+                  <AccountCircle />
+                </IconButton>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={() => setAnchorEl(null)}
+                >
+                  <MenuItem onClick={() => router.push('/profile')}>
+                    プロフィール
+                  </MenuItem>
+                  <MenuItem onClick={() => signOut()}>
+                    <Logout sx={{ mr: 1 }} />
+                    ログアウト
+                  </MenuItem>
+                </Menu>
+              </>
+            ) : (
+              <Button
+                color="inherit"
+                startIcon={<Login />}
+                onClick={() => signIn()}
+                sx={{ color: '#1565c0' }}
+              >
+                ログイン
+              </Button>
             )}
-          </>
-        )}
+          </Toolbar>
+        </AppBar>
+        <Container maxWidth="md" sx={{ py: 4 }}>
+          <Box sx={{ mb: 4, textAlign: 'center' }}>
+            <Typography 
+              variant="h3" 
+              component="h1" 
+              gutterBottom
+              sx={{ 
+                fontWeight: 700,
+                color: '#1565c0',
+                textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              }}
+            >
+              💬 掲示板
+            </Typography>
+            <Typography 
+              variant="h6" 
+              color="text.secondary"
+              sx={{ 
+                backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                backdropFilter: 'blur(10px)',
+                borderRadius: 2,
+                px: 3,
+                py: 1,
+                display: 'inline-block',
+              }}
+            >
+              スレッドを作成して、みんなで議論しよう！
+            </Typography>
+          </Box>
 
-        <Fab
-          color="primary"
-          aria-label="add"
-          sx={{ position: 'fixed', bottom: 16, right: 16 }}
-          onClick={handleNewPost}
-        >
-          <AddIcon />
-        </Fab>
+          <Box sx={{ mb: 3 }}>
+            <Tabs
+              value={selectedCategory}
+              onChange={handleCategoryChange}
+              variant="scrollable"
+              scrollButtons="auto"
+              sx={{
+                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                backdropFilter: 'blur(10px)',
+                borderRadius: 2,
+                '& .MuiTab-root': {
+                  fontWeight: 600,
+                  '&.Mui-selected': {
+                    color: '#1565c0',
+                  },
+                },
+                '& .MuiTabs-indicator': {
+                  backgroundColor: '#1565c0',
+                  height: 3,
+                  borderRadius: 1.5,
+                },
+              }}
+            >
+              {categories.map((category, index) => (
+                <Tab
+                  key={category}
+                  label={category}
+                  sx={{
+                    minWidth: 'auto',
+                    px: 2,
+                  }}
+                />
+              ))}
+            </Tabs>
+          </Box>
 
-        {/* 投稿作成・編集ダイアログ */}
-        <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth>
-          <DialogTitle>
-            {editingPost ? '投稿を編集' : '新しい投稿'}
-          </DialogTitle>
-          <DialogContent>
-            <TextField
-              {...register('title')}
-              autoFocus
-              margin="dense"
-              label="タイトル"
-              fullWidth
-              variant="outlined"
-              error={!!errors.title}
-              helperText={errors.title?.message}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              {...register('content')}
-              margin="dense"
-              label="内容"
-              fullWidth
-              multiline
-              rows={6}
-              variant="outlined"
-              error={!!errors.content}
-              helperText={errors.content?.message}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpen(false)}>キャンセル</Button>
-            <Button onClick={handleSubmit(onSubmit)} variant="contained">
-              {editingPost ? '更新' : '投稿'}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Container>
-    </>
+          <ThreadList
+            threads={filteredThreads}
+            onThreadClick={handleThreadClick}
+            onEdit={handleEditThread}
+            onDelete={handleDeleteThread}
+            currentUser={currentUser}
+          />
+
+          <Fab
+            color="primary"
+            aria-label="add thread"
+            sx={{ 
+              position: 'fixed', 
+              bottom: 16, 
+              right: 16,
+              boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
+            }}
+            onClick={handleFabClick}
+          >
+            <Add />
+          </Fab>
+
+          <ThreadForm
+            open={isFormOpen}
+            onClose={handleCloseForm}
+            onSubmit={handleSubmitForm}
+            editingThread={editingThread ? {
+              _id: editingThread._id,
+              title: editingThread.title,
+              description: editingThread.description,
+              category: editingThread.category,
+              creator: editingThread.creator.toString()
+            } : null}
+            defaultCreator={userProfile?.name || session?.user?.name || ''}
+          />
+
+          <Snackbar
+            open={snackbar.open}
+            autoHideDuration={6000}
+            onClose={() => setSnackbar({ ...snackbar, open: false })}
+          >
+            <Alert
+              onClose={() => setSnackbar({ ...snackbar, open: false })}
+              severity={snackbar.severity}
+              sx={{ width: '100%' }}
+            >
+              {snackbar.message}
+            </Alert>
+          </Snackbar>
+        </Container>
+      </Box>
+    </ThemeProvider>
   )
 }

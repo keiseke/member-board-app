@@ -130,8 +130,10 @@ jest.mock('bson', () => ({
   }
 }))
 
-// dbConnectのモック
-jest.mock('@/lib/dbConnect', () => jest.fn().mockResolvedValue({}))
+// データベース接続のモック
+jest.mock('@/lib/mongodb', () => ({
+  connectDB: jest.fn().mockResolvedValue({})
+}))
 
 // Post モデルのモック - 修正版
 const createMockPost = () => ({
@@ -276,3 +278,60 @@ beforeEach(() => {
   fetch.mockClear()
   jest.clearAllMocks()
 })
+
+// MongoDB Memory Server のグローバル設定
+process.env.MONGODB_MEMORY_SERVER_OPTS = JSON.stringify({
+  binary: {
+    version: '6.0.4',
+    skipMD5: true
+  },
+  instance: {
+    storageEngine: 'wiredTiger'
+  },
+  replSet: {
+    count: 1,
+    storageEngine: 'wiredTiger'
+  }
+})
+
+// NextAuth の環境変数設定
+process.env.NEXTAUTH_URL = 'http://localhost:3000'
+process.env.NEXTAUTH_SECRET = 'test-secret-key-for-testing-only'
+
+// メール送信のテスト環境設定
+process.env.SMTP_HOST = 'localhost'
+process.env.SMTP_PORT = '587'
+process.env.SMTP_USER = 'test@example.com'
+process.env.SMTP_PASSWORD = 'test-password'
+
+// Console warnings/errors を抑制（テスト環境でのみ）
+if (process.env.NODE_ENV === 'test') {
+  const originalConsoleError = console.error
+  const originalConsoleWarn = console.warn
+
+  console.error = (...args) => {
+    if (
+      typeof args[0] === 'string' && (
+        args[0].includes('Warning: ReactDOM.render is no longer supported') ||
+        args[0].includes('Warning: validateDOMNesting') ||
+        args[0].includes('Warning: Function components cannot be given refs')
+      )
+    ) {
+      return
+    }
+    originalConsoleError.apply(console, args)
+  }
+
+  console.warn = (...args) => {
+    if (
+      typeof args[0] === 'string' && (
+        args[0].includes('componentWillReceiveProps') ||
+        args[0].includes('componentWillUpdate') ||
+        args[0].includes('componentWillMount')
+      )
+    ) {
+      return
+    }
+    originalConsoleWarn.apply(console, args)
+  }
+}

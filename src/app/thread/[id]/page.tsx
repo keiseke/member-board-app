@@ -295,7 +295,7 @@ export default function ThreadPage() {
     }
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: string | Date) => {
     return new Date(date).toLocaleDateString('ja-JP', {
       year: 'numeric',
       month: 'short',

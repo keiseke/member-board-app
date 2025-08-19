@@ -83,7 +83,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, account, trigger, session: sessionData }) {
       if (user) {
         token.id = user.id
-        token.emailVerified = user.emailVerified
+        token.emailVerified = !!user.emailVerified
         token.role = (user as any).role
       }
       

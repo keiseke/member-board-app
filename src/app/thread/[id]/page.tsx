@@ -35,7 +35,7 @@ const LogoutIcon = Logout
 import { signOut } from 'next-auth/react';
 import PostForm from '@/components/PostForm';
 import ThreadForm from '@/components/ThreadForm';
-import { IPost } from '@/models/Post';
+import { IPostWithId } from '@/models/Post';
 
 interface Thread {
   _id: string;
@@ -49,16 +49,7 @@ interface Thread {
   updatedAt: string;
 }
 
-interface Post {
-  _id: string;
-  title: string;
-  content: string;
-  threadId: string;
-  author: string;
-  authorName: string;
-  createdAt: string;
-  updatedAt: string;
-}
+type Post = IPostWithId
 
 
 export default function ThreadPage() {
@@ -261,7 +252,7 @@ export default function ThreadPage() {
     }
   };
 
-  const handlePostMenuClick = (event: React.MouseEvent<HTMLElement>, post: IPost & { _id: string }) => {
+  const handlePostMenuClick = (event: React.MouseEvent<HTMLElement>, post: Post) => {
     event.stopPropagation();
     setPostMenuAnchorEl(event.currentTarget);
     setSelectedPost(post);

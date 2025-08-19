@@ -8,8 +8,8 @@ interface HealthCheck {
   uptime: number
   checks: {
     database: 'healthy' | 'unhealthy' | 'checking...'
-    memory: 'healthy' | 'warning' | 'critical'
-    environment: 'healthy' | 'unhealthy'
+    memory: 'healthy' | 'warning' | 'critical' | 'checking...'
+    environment: 'healthy' | 'unhealthy' | 'checking...'
   }
   metrics: {
     memoryUsage: NodeJS.MemoryUsage

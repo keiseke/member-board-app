@@ -35,6 +35,7 @@ const LogoutIcon = Logout
 import { signOut } from 'next-auth/react';
 import PostForm from '@/components/PostForm';
 import ThreadForm from '@/components/ThreadForm';
+import { IPost } from '@/models/Post';
 
 interface Thread {
   _id: string;

@@ -23,16 +23,17 @@ import {
   Select,
   MenuItem as SelectMenuItem
 } from '@mui/material'
-import AccountCircle from '@mui/icons-material/AccountCircle'
-import Check from '@mui/icons-material/Check'
-import Close from '@mui/icons-material/Close'
-import Logout from '@mui/icons-material/Logout'
-import ArrowBack from '@mui/icons-material/ArrowBack'
+// Icons replaced with text for build compatibility
+// import AccountCircle from '@mui/icons-material/AccountCircle'
+// import Check from '@mui/icons-material/Check'
+// import Close from '@mui/icons-material/Close'
+// import Logout from '@mui/icons-material/Logout'
+// import ArrowBack from '@mui/icons-material/ArrowBack'
 
-const SaveIcon = Check
-const CancelIcon = Close
-const LogoutIcon = Logout
-const ArrowBackIcon = ArrowBack
+const SaveIcon = () => '✓'
+const CancelIcon = () => '✖'
+const LogoutIcon = () => '🚪'
+const ArrowBackIcon = () => '←'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -131,7 +132,7 @@ export default function NewPostPage() {
             color="inherit"
             onClick={(e) => setAnchorEl(e.currentTarget)}
           >
-            <AccountCircle />
+            👤
           </IconButton>
           <Menu
             anchorEl={anchorEl}
@@ -139,7 +140,7 @@ export default function NewPostPage() {
             onClose={() => setAnchorEl(null)}
           >
             <MenuItem onClick={() => signOut()}>
-              <LogoutIcon sx={{ mr: 1 }} />
+              <span style={{ marginRight: 8 }}><LogoutIcon /></span>
               ログアウト
             </MenuItem>
           </Menu>

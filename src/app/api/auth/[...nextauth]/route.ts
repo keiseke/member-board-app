@@ -1,5 +1,5 @@
 // src/app/api/auth/[...nextauth]/route.ts
-import NextAuth from '@/auth'
+import NextAuth from '../../../../auth'
 
 export const runtime = 'nodejs'
 

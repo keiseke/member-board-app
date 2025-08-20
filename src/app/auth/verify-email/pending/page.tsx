@@ -12,7 +12,8 @@ import {
   CircularProgress,
   Link
 } from '@mui/material'
-import { Email, CheckCircle, Refresh as RefreshIcon } from '@mui/icons-material'
+// Icons replaced with text for build compatibility
+// import { Email, CheckCircle, Refresh as RefreshIcon } from '@mui/icons-material'
 
 export default function VerifyEmailPendingPage() {
   const router = useRouter()
@@ -95,7 +96,9 @@ export default function VerifyEmailPendingPage() {
             width: '100%'
           }}
         >
-          <Email sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
+          <Box sx={{ fontSize: 60, color: 'primary.main', mb: 2, textAlign: 'center' }}>
+            📧
+          </Box>
           
           <Typography component="h1" variant="h4" gutterBottom align="center">
             メール認証が必要です
@@ -109,7 +112,7 @@ export default function VerifyEmailPendingPage() {
           <Alert severity="info" sx={{ width: '100%', mb: 3 }}>
             <Box>
               <Typography variant="body2" gutterBottom>
-                <CheckCircle sx={{ fontSize: 16, mr: 1, verticalAlign: 'middle' }} />
+                <span style={{ fontSize: 16, marginRight: 8, verticalAlign: 'middle' }}>✓</span>
                 メールが届かない場合は、以下をご確認ください：
               </Typography>
               <ul style={{ margin: 0, paddingLeft: 20 }}>
@@ -137,7 +140,7 @@ export default function VerifyEmailPendingPage() {
               variant="outlined"
               onClick={handleResendEmail}
               disabled={isResending || countdown > 0}
-              startIcon={isResending ? <CircularProgress size={20} /> : <RefreshIcon />}
+              startIcon={isResending ? <CircularProgress size={20} /> : '🔄'}
               sx={{ mb: 2 }}
             >
               {isResending ? '送信中...' : 

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { usePermissions } from '@/hooks/usePermissions';
+import { usePermissions } from '../../../hooks/usePermissions';
 import {
   Container,
   Typography,
@@ -22,20 +22,21 @@ import {
   AppBar,
   Toolbar,
 } from '@mui/material';
-import Add from '@mui/icons-material/Add';
-import ArrowBack from '@mui/icons-material/ArrowBack';
-import Forum from '@mui/icons-material/Forum';
-import MoreVert from '@mui/icons-material/MoreVert';
-import Edit from '@mui/icons-material/Edit';
-import Delete from '@mui/icons-material/Delete';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import Logout from '@mui/icons-material/Logout';
+// Icons replaced with text for build compatibility
+// import Add from '@mui/icons-material/Add';
+// import ArrowBack from '@mui/icons-material/ArrowBack';
+// import Forum from '@mui/icons-material/Forum';
+// import MoreVert from '@mui/icons-material/MoreVert';
+// import Edit from '@mui/icons-material/Edit';
+// import Delete from '@mui/icons-material/Delete';
+// import AccountCircle from '@mui/icons-material/AccountCircle';
+// import Logout from '@mui/icons-material/Logout';
 
-const LogoutIcon = Logout
+const LogoutIcon = () => '🚪'
 import { signOut } from 'next-auth/react';
-import PostForm from '@/components/PostForm';
-import ThreadForm from '@/components/ThreadForm';
-import { IPostWithId } from '@/models/Post';
+import PostForm from '../../../components/PostForm';
+import ThreadForm from '../../../components/ThreadForm';
+import { IPostWithId } from '../../../models/Post';
 
 interface Thread {
   _id: string;
@@ -340,7 +341,7 @@ export default function ThreadPage() {
             color="inherit"
             onClick={handleHeaderMenuClick}
           >
-            <AccountCircle />
+            👤
           </IconButton>
           <Menu
             anchorEl={headerMenuAnchorEl}
@@ -348,7 +349,7 @@ export default function ThreadPage() {
             onClose={handleHeaderMenuClose}
           >
             <MenuItem onClick={() => signOut()}>
-              <LogoutIcon sx={{ mr: 1 }} />
+              <span style={{ marginRight: 8 }}><LogoutIcon /></span>
               ログアウト
             </MenuItem>
           </Menu>
@@ -358,7 +359,7 @@ export default function ThreadPage() {
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Box sx={{ mb: 3 }}>
           <Button
-            startIcon={<ArrowBack />}
+            startIcon={'←'}
             onClick={() => router.push('/')}
             sx={{ mb: 2, color: '#ec4899' }}
           >
@@ -405,7 +406,7 @@ export default function ThreadPage() {
                         flexShrink: 0, // ボタンも縮小しない
                       }}
                     >
-                      <MoreVert />
+                      ⋮
                     </IconButton>
                   )}
                 </Box>
@@ -417,7 +418,7 @@ export default function ThreadPage() {
               
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, color: 'text.secondary' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Forum fontSize="small" />
+                  💬
                   <Typography variant="body2">
                     {thread.postCount}件の投稿
                   </Typography>
@@ -485,7 +486,7 @@ export default function ThreadPage() {
                             flexShrink: 0, // ボタンも縮小しない
                           }}
                         >
-                          <MoreVert fontSize="small" data-testid="MoreVert" />
+                          <span data-testid="MoreVert">⋮</span>
                         </IconButton>
                       )}
                     </Box>
@@ -510,7 +511,7 @@ export default function ThreadPage() {
           sx={{ position: 'fixed', bottom: 16, right: 16 }}
           onClick={() => setIsFormOpen(true)}
         >
-          <Add />
+          +
         </Fab>
 
         <PostForm
@@ -535,11 +536,11 @@ export default function ThreadPage() {
           onClose={handleMenuClose}
         >
           <MenuItem onClick={handleEditClick}>
-            <Edit fontSize="small" sx={{ mr: 1 }} />
+            <span style={{ marginRight: 8 }}>✏️</span>
             編集
           </MenuItem>
           <MenuItem onClick={handleDeleteClick} sx={{ color: 'error.main' }}>
-            <Delete fontSize="small" sx={{ mr: 1 }} />
+            <span style={{ marginRight: 8 }}>🗑️</span>
             削除
           </MenuItem>
         </Menu>
@@ -550,11 +551,11 @@ export default function ThreadPage() {
           onClose={handlePostMenuClose}
         >
           <MenuItem onClick={handleEditPost}>
-            <Edit fontSize="small" sx={{ mr: 1 }} />
+            <span style={{ marginRight: 8 }}>✏️</span>
             編集
           </MenuItem>
           <MenuItem onClick={handleDeletePostFromMenu} sx={{ color: 'error.main' }}>
-            <Delete fontSize="small" sx={{ mr: 1 }} />
+            <span style={{ marginRight: 8 }}>🗑️</span>
             削除
           </MenuItem>
         </Menu>

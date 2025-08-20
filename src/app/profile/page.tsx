@@ -26,26 +26,27 @@ import {
   DialogActions,
   Divider
 } from '@mui/material'
+// Icons replaced with text for build compatibility
 // Material-UI Core Icons - using only the most basic icons
-import AccountCircle from '@mui/icons-material/AccountCircle'
-import Edit from '@mui/icons-material/Edit'
-import Check from '@mui/icons-material/Check'
-import Close from '@mui/icons-material/Close'
-import Logout from '@mui/icons-material/Logout'
-import ArrowBack from '@mui/icons-material/ArrowBack'
-import Lock from '@mui/icons-material/Lock'
-import Delete from '@mui/icons-material/Delete'
+// import AccountCircle from '@mui/icons-material/AccountCircle'
+// import Edit from '@mui/icons-material/Edit'
+// import Check from '@mui/icons-material/Check'
+// import Close from '@mui/icons-material/Close'
+// import Logout from '@mui/icons-material/Logout'
+// import ArrowBack from '@mui/icons-material/ArrowBack'
+// import Lock from '@mui/icons-material/Lock'
+// import Delete from '@mui/icons-material/Delete'
 
 // Visibility icons no longer needed - using text buttons instead
 
 // Aliases for existing icons
-const EditIcon = Edit
-const SaveIcon = Check
-const CancelIcon = Close
-const LogoutIcon = Logout
-const ArrowBackIcon = ArrowBack
-const LockIcon = Lock
-const DeleteIcon = Delete
+const EditIcon = () => '✏️'
+const SaveIcon = () => '✓'
+const CancelIcon = () => '✖'
+const LogoutIcon = () => '🚪'
+const ArrowBackIcon = () => '←'
+const LockIcon = () => '🔒'
+const DeleteIcon = () => '🗑️'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -333,7 +334,7 @@ export default function ProfilePage() {
             color="inherit"
             onClick={(e) => setAnchorEl(e.currentTarget)}
           >
-            <AccountCircle />
+            👤
           </IconButton>
           <Menu
             anchorEl={anchorEl}
@@ -341,7 +342,7 @@ export default function ProfilePage() {
             onClose={() => setAnchorEl(null)}
           >
             <MenuItem onClick={() => signOut()}>
-              <LogoutIcon sx={{ mr: 1 }} />
+              <span style={{ marginRight: 8 }}><LogoutIcon /></span>
               ログアウト
             </MenuItem>
           </Menu>
@@ -400,7 +401,7 @@ export default function ProfilePage() {
                         ml: 1
                       }}
                     >
-                      <DeleteIcon fontSize="small" />
+                      <DeleteIcon />
                     </IconButton>
                   )}
                 </Box>

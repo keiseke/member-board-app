@@ -22,19 +22,20 @@ import {
   MenuItem,
   Button,
 } from '@mui/material'
-import Add from '@mui/icons-material/Add'
-import AccountCircle from '@mui/icons-material/AccountCircle'
-import Login from '@mui/icons-material/Login'
-import Logout from '@mui/icons-material/Logout'
-import ThreadList from '@/components/ThreadList'
+// Icons replaced with text for build compatibility
+// import Add from '@mui/icons-material/Add'
+// import AccountCircle from '@mui/icons-material/AccountCircle'
+// import Login from '@mui/icons-material/Login'
+// import Logout from '@mui/icons-material/Logout'
+import ThreadList from '../../components/ThreadList'
 import dynamic from 'next/dynamic'
 
 // Dynamic import for ThreadForm - 遅延読み込みで初回読み込み時間を短縮
-const ThreadForm = dynamic(() => import('@/components/ThreadForm'), {
+const ThreadForm = dynamic(() => import('../../components/ThreadForm'), {
   loading: () => <Box sx={{ p: 2, textAlign: 'center' }}>フォームを読み込んでいます...</Box>,
   ssr: false,
 })
-import { IThread } from '@/models/Thread'
+import { IThread } from '../../models/Thread'
 
 const categories = [
   '全て',
@@ -303,7 +304,7 @@ export default function DashboardPage() {
                   onClick={(e) => setAnchorEl(e.currentTarget)}
                   sx={{ color: '#1565c0' }}
                 >
-                  <AccountCircle />
+                  👤
                 </IconButton>
                 <Menu
                   anchorEl={anchorEl}
@@ -314,7 +315,7 @@ export default function DashboardPage() {
                     プロフィール
                   </MenuItem>
                   <MenuItem onClick={() => signOut()}>
-                    <Logout sx={{ mr: 1 }} />
+                    🚪
                     ログアウト
                   </MenuItem>
                 </Menu>
@@ -322,7 +323,7 @@ export default function DashboardPage() {
             ) : (
               <Button
                 color="inherit"
-                startIcon={<Login />}
+                startIcon={'🔑'}
                 onClick={() => signIn()}
                 sx={{ color: '#1565c0' }}
               >
@@ -416,7 +417,7 @@ export default function DashboardPage() {
             }}
             onClick={handleFabClick}
           >
-            <Add />
+            +
           </Fab>
 
           <ThreadForm

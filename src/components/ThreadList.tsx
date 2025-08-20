@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { usePermissions } from '@/hooks/usePermissions';
+import { usePermissions } from '../hooks/usePermissions';
 import {
   Card,
   CardContent,
@@ -12,13 +12,14 @@ import {
   Menu,
   MenuItem,
 } from '@mui/material';
-import Forum from '@mui/icons-material/Forum';
-import AccessTime from '@mui/icons-material/AccessTime';
-import Person from '@mui/icons-material/Person';
-import MoreVert from '@mui/icons-material/MoreVert';
-import Edit from '@mui/icons-material/Edit';
-import Delete from '@mui/icons-material/Delete';
-import { IThread } from '@/models/Thread';
+// Icons replaced with text for build compatibility
+// import Forum from '@mui/icons-material/Forum';
+// import AccessTime from '@mui/icons-material/AccessTime';
+// import Person from '@mui/icons-material/Person';
+// import MoreVert from '@mui/icons-material/MoreVert';
+// import Edit from '@mui/icons-material/Edit';
+// import Delete from '@mui/icons-material/Delete';
+import { IThread } from '../models/Thread';
 
 interface ThreadListProps {
   threads: (IThread & { _id: string })[];
@@ -154,7 +155,7 @@ const ThreadList: React.FC<ThreadListProps> = ({
                         flexShrink: 0, // ボタンも縮小しない
                       }}
                     >
-                      <MoreVert fontSize="small" data-testid="MoreVert" />
+                      <span data-testid="MoreVert">⋮</span>
                     </IconButton>
                   )}
                 </Box>
@@ -166,19 +167,19 @@ const ThreadList: React.FC<ThreadListProps> = ({
               
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, color: 'text.secondary' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Forum fontSize="small" />
+                  <span>💬</span>
                   <Typography variant="caption">
                     {thread.postCount}件
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Person fontSize="small" />
+                  <span>👤</span>
                   <Typography variant="caption">
                     {thread.creatorName}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <AccessTime fontSize="small" />
+                  <span>🕒</span>
                   <Typography variant="caption">
                     {formatDate(thread.updatedAt)}
                   </Typography>
@@ -197,13 +198,13 @@ const ThreadList: React.FC<ThreadListProps> = ({
       >
         {onEdit && (
           <MenuItem onClick={handleEdit} data-testid="edit-thread-menu-item">
-            <Edit fontSize="small" sx={{ mr: 1 }} data-testid="EditIcon" />
+            <span style={{ marginRight: 8 }} data-testid="EditIcon">✏️</span>
             編集
           </MenuItem>
         )}
         {onDelete && (
           <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }} data-testid="delete-thread-menu-item">
-            <Delete fontSize="small" sx={{ mr: 1 }} data-testid="DeleteIcon" />
+            <span style={{ marginRight: 8 }} data-testid="DeleteIcon">🗑️</span>
             削除
           </MenuItem>
         )}

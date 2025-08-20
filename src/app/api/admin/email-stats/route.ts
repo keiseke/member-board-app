@@ -1,9 +1,9 @@
 // src/app/api/admin/email-stats/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { connectDB } from '@/lib/mongodb'
-import { EmailLog } from '@/models/EmailLog'
+import { connectDB } from '../../../../lib/mongodb'
+import { EmailLog } from '../../../../models/EmailLog'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/auth'
+import { authOptions } from '../../../../auth'
 
 export async function GET(request: NextRequest) {
   try {

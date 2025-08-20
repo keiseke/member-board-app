@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     const stats = await EmailLog.getDeliveryStats(dateFrom)
     
     // 最近の失敗メール
-    const recentFailures = await EmailLog.find({
+    const recentFailures = await (EmailLog as any).find({
       status: 'failed',
       createdAt: { $gte: dateFrom }
     })
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     .limit(20)
     
     // 日別配信数
-    const dailyStats = await EmailLog.aggregate([
+    const dailyStats = await (EmailLog as any).aggregate([
       {
         $match: {
           createdAt: { $gte: dateFrom }

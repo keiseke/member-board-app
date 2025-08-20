@@ -12,9 +12,7 @@ import {
   CircularProgress,
   Link
 } from '@mui/material'
-import Email from '@mui/icons-material/Email'
-import CheckCircle from '@mui/icons-material/CheckCircle'
-import RefreshIcon from '@mui/icons-material/Refresh'
+import { Email, CheckCircle, Refresh as RefreshIcon } from '@mui/icons-material'
 
 export default function VerifyEmailPendingPage() {
   const router = useRouter()

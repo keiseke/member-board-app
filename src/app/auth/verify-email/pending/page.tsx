@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 import Email from '@mui/icons-material/Email'
 import CheckCircle from '@mui/icons-material/CheckCircle'
-import Refresh from '@mui/icons-material/Refresh'
+import RefreshIcon from '@mui/icons-material/Refresh'
 
 export default function VerifyEmailPendingPage() {
   const router = useRouter()
@@ -139,7 +139,7 @@ export default function VerifyEmailPendingPage() {
               variant="outlined"
               onClick={handleResendEmail}
               disabled={isResending || countdown > 0}
-              startIcon={isResending ? <CircularProgress size={20} /> : <Refresh />}
+              startIcon={isResending ? <CircularProgress size={20} /> : <RefreshIcon />}
               sx={{ mb: 2 }}
             >
               {isResending ? '送信中...' : 

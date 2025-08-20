@@ -72,14 +72,21 @@ export async function POST(request: NextRequest) {
     })
 
     // 認証メール送信
+    console.log('📧 認証メール送信開始:', { email, name, token: verificationToken.substring(0, 8) + '...' })
     const emailResult = await sendVerificationEmail(email, name, verificationToken)
+    console.log('📧 認証メール送信結果:', emailResult)
     
     if (!emailResult.success) {
       // ユーザーは作成されたが、メール送信に失敗
-      console.error('認証メール送信エラー:', emailResult.error)
+      console.error('❌ 認証メール送信エラー:', {
+        error: emailResult.error,
+        email,
+        logId: emailResult.logId
+      })
       return NextResponse.json(
         { 
-          error: 'アカウントは作成されましたが、認証メールの送信に失敗しました。サポートにお問い合わせください。'
+          error: 'アカウントは作成されましたが、認証メールの送信に失敗しました。サポートにお問い合わせください。',
+          details: `エラー: ${emailResult.error}`
         },
         { status: 201 } // 部分的成功
       )

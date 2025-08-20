@@ -64,12 +64,13 @@ export async function sendEmail(options: SendEmailOptions) {
       sentAt: new Date()
     })
     
-    console.log('📧 メール送信成功:', {
+    console.log('✅ メール送信成功:', {
       logId: emailLogId,
       messageId: result.messageId,
       to: options.to,
       subject: finalSubject,
-      from: sender.address
+      from: sender.address,
+      type: options.type
     })
 
     return {
@@ -79,7 +80,13 @@ export async function sendEmail(options: SendEmailOptions) {
       logId: emailLogId
     }
   } catch (error) {
-    console.error('❌ メール送信エラー:', error)
+    console.error('❌ メール送信エラー詳細:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      to: options.to,
+      subject: options.subject,
+      type: options.type
+    })
     
     // 送信失敗時にログを更新
     if (emailLogId) {

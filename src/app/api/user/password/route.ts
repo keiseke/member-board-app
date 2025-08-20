@@ -32,7 +32,7 @@ export async function PUT(request: NextRequest) {
 
     await connectDB()
 
-    const user = await User.findById(session.user.id).select('+password')
+    const user = await (User as any).findById(session.user.id).select('+password')
     
     if (!user) {
       return NextResponse.json(

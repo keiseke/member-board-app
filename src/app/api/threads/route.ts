@@ -15,7 +15,7 @@ const threadSchema = z.object({
 export async function GET() {
   try {
     await connectDB();
-    const threads = await Thread.find({})
+    const threads = await (Thread as any).find({})
       .populate('creator', 'name')
       .sort({ updatedAt: -1 });
     
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     await thread.save();
     
-    const populatedThread = await Thread.findById(thread._id).populate('creator', 'name');
+    const populatedThread = await (Thread as any).findById(thread._id).populate('creator', 'name');
     
     return NextResponse.json(populatedThread, { status: 201 });
   } catch (error) {

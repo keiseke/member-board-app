@@ -1,7 +1,7 @@
 // src/app/auth/login/page.tsx
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, Suspense } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
@@ -26,7 +26,7 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
@@ -166,5 +166,29 @@ export default function LoginPage() {
         </Paper>
       </Box>
     </Container>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <Container maxWidth="sm">
+        <Box
+          sx={{
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Paper sx={{ p: 4, textAlign: 'center' }}>
+            <CircularProgress sx={{ mb: 2 }} />
+            <Typography variant="h6">読み込み中...</Typography>
+          </Paper>
+        </Box>
+      </Container>
+    }>
+      <LoginContent />
+    </Suspense>
   )
 }

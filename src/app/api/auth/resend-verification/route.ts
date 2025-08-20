@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     await connectDB()
 
     // ユーザー検索
-    const user = await User.findOne({ email }).select('+emailVerificationToken +emailVerificationExpires')
+    const user = await (User as any).findOne({ email }).select('+emailVerificationToken +emailVerificationExpires')
     
     if (!user) {
       return NextResponse.json(
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24時間後
 
     // ユーザー更新
-    await User.findByIdAndUpdate(user._id, {
+    await (User as any).findByIdAndUpdate(user._id, {
       emailVerificationToken: verificationToken,
       emailVerificationExpires: verificationExpires
     })

@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     await connectDB()
 
     // 既存ユーザーチェック
-    const existingUser = await User.findOne({ email })
+    const existingUser = await (User as any).findOne({ email })
     if (existingUser) {
       return NextResponse.json(
         { error: 'このメールアドレスは既に登録されています' },
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24時間後
 
     // ユーザー作成
-    const user = await User.create({
+    const user = await (User as any).create({
       name,
       email,
       password: hashedPassword,

@@ -11,7 +11,7 @@ export async function GET(
     await connectDB();
     const { id } = await params;
     
-    const posts = await Post.find({ threadId: id }).sort({ createdAt: 1 });
+    const posts = await (Post as any).find({ threadId: id }).sort({ createdAt: 1 });
     return NextResponse.json(posts);
   } catch (error) {
     console.error('Posts fetch error:', error);
@@ -50,7 +50,7 @@ export async function POST(
     await post.save();
 
     // スレッドの投稿数を更新
-    await Thread.findByIdAndUpdate(id, {
+    await (Thread as any).findByIdAndUpdate(id, {
       $inc: { postCount: 1 },
       updatedAt: new Date(),
     });

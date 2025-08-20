@@ -5,7 +5,7 @@ import { connectDB } from '@/lib/mongodb'
 import { EmailLog } from '@/models/EmailLog'
 
 // トランスポーター作成
-const transporter = nodemailer.createTransport(emailConfig.smtp)
+const transporter = nodemailer.createTransport(emailConfig.smtp as any)
 
 // メール送信オプション型定義
 export interface SendEmailOptions {

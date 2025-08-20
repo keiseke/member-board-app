@@ -33,13 +33,13 @@ export async function GET(request: NextRequest) {
     
     const filter = threadId ? { threadId } : {};
     
-    const posts = await Post.find(filter)
+    const posts = await (Post as any).find(filter)
       .populate('author', 'name')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
     
-    const total = await Post.countDocuments(filter);
+    const total = await (Post as any).countDocuments(filter);
     
     return NextResponse.json({
       posts,
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    const thread = await Thread.findById(threadId);
+    const thread = await (Thread as any).findById(threadId);
     if (!thread) {
       return NextResponse.json(
         { error: 'スレッドが見つかりません' },
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
     thread.postCount = (thread.postCount || 0) + 1;
     await thread.save();
     
-    const populatedPost = await Post.findById(post._id).populate('author', 'name');
+    const populatedPost = await (Post as any).findById(post._id).populate('author', 'name');
     
     return NextResponse.json(populatedPost, { status: 201 });
   } catch (error) {

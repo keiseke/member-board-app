@@ -27,7 +27,7 @@ export async function GET() {
     await connectDB()
     console.log('データベース接続完了')
 
-    const user = await User.findById(session.user.id).select('name email bio +avatarUrl emailVerified')
+    const user = await (User as any).findById(session.user.id).select('name email bio +avatarUrl emailVerified')
     console.log('Mongooseユーザー取得結果:', {
       found: !!user,
       name: user?.name,
@@ -103,7 +103,7 @@ export async function PUT(request: NextRequest) {
 
     await connectDB()
 
-    const user = await User.findById(session.user.id)
+    const user = await (User as any).findById(session.user.id)
     
     if (!user) {
       return NextResponse.json(

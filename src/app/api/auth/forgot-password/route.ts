@@ -31,8 +31,8 @@ export async function POST(request: NextRequest) {
 
     await connectDB()
 
-    // ユーザー検索
-    const user = await User.findOne({ email })
+    // ユーザー検索  
+    const user = await (User as any).findOne({ email }).select('+resetPasswordToken +resetPasswordExpires')
     
     if (!user) {
       // セキュリティのため、ユーザーが存在しなくても成功レスポンス

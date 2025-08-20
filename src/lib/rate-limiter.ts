@@ -81,7 +81,7 @@ export function getClientIP(req: NextRequest): string {
   }
   
   // フォールバック
-  return req.ip || 'unknown'
+  return (req as any).ip || 'unknown'
 }
 
 // 異なる用途のレート制限インスタンス

@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     await connectDB()
     console.log('データベース接続成功')
 
-    const user = await User.findById(session.user.id)
+    const user = await (User as any).findById(session.user.id)
     console.log('ユーザー検索結果:', user ? '見つかりました' : '見つかりません')
     console.log('ユーザーID:', session.user.id)
     
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
       await new Promise(resolve => setTimeout(resolve, 100))
       
       // 方法2: 新しい接続で確認
-      const verifyUser = await User.findById(session.user.id).select('+avatarUrl')
+      const verifyUser = await (User as any).findById(session.user.id).select('+avatarUrl')
       console.log('確認用取得 - avatarUrl存在:', !!verifyUser?.avatarUrl)
       console.log('確認用取得 - avatarUrl長さ:', verifyUser?.avatarUrl?.length)
       
@@ -124,14 +124,14 @@ export async function POST(request: NextRequest) {
         const objectId = new mongoose.Types.ObjectId(session.user.id)
         console.log('ObjectId変換:', objectId.toString())
         
-        const updateResult = await User.updateOne(
+        const updateResult = await (User as any).updateOne(
           { _id: objectId },
           { $set: { avatarUrl: dataUrl } }
         )
         console.log('updateOne結果:', updateResult)
         
         // 再確認
-        const finalVerify = await User.findById(objectId).select('+avatarUrl')
+        const finalVerify = await (User as any).findById(objectId).select('+avatarUrl')
         console.log('最終確認 - avatarUrl存在:', !!finalVerify?.avatarUrl)
         console.log('最終確認 - avatarUrl長さ:', finalVerify?.avatarUrl?.length)
         
@@ -187,7 +187,7 @@ export async function DELETE() {
 
     await connectDB()
 
-    const user = await User.findById(session.user.id)
+    const user = await (User as any).findById(session.user.id)
     
     if (!user) {
       return NextResponse.json(

@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     await connectDB()
 
     // トークンでユーザーを検索
-    const user = await User.findOne({
+    const user = await (User as any).findOne({
       resetPasswordToken: token,
       resetPasswordExpires: { $gt: new Date() }
     }).select('+password')

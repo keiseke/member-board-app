@@ -38,7 +38,7 @@ export const authOptions: NextAuthOptions = {
           const { email, password } = validatedFields.data
 
           await connectDB()
-          const user = await User.findOne({ email }).select('+password')
+          const user = await (User as any).findOne({ email }).select('+password')
 
           if (!user) {
             console.log('ユーザーが見つかりません:', email)

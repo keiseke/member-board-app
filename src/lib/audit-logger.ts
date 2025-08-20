@@ -114,7 +114,7 @@ export class AuditLogger {
       }
 
       // データベースに保存
-      await AuditLog.create(auditLog)
+      await (AuditLog as any).create(auditLog)
 
       // 重要なイベントの場合は追加処理
       if (this.isCriticalEvent(event) || severity === 'critical') {
@@ -146,7 +146,7 @@ export class AuditLogger {
         timestamp: event.timestamp || new Date()
       }))
 
-      await AuditLog.insertMany(auditLogs)
+      await (AuditLog as any).insertMany(auditLogs)
     } catch (error) {
       console.error('Batch audit logging failed:', error)
     }
@@ -178,7 +178,7 @@ export class AuditLogger {
       if (filters.endDate) query.timestamp.$lte = filters.endDate
     }
 
-    return await AuditLog
+    return await (AuditLog as any)
       .find(query)
       .sort({ timestamp: -1 })
       .limit(filters.limit || 100)
@@ -201,13 +201,13 @@ export class AuditLogger {
     const since = new Date(now.getTime() - timeframes[timeframe])
 
     const [totalEvents, failedEvents, severityStats, actionStats] = await Promise.all([
-      AuditLog.countDocuments({ timestamp: { $gte: since } }),
-      AuditLog.countDocuments({ timestamp: { $gte: since }, success: false }),
-      AuditLog.aggregate([
+      (AuditLog as any).countDocuments({ timestamp: { $gte: since } }),
+      (AuditLog as any).countDocuments({ timestamp: { $gte: since }, success: false }),
+      (AuditLog as any).aggregate([
         { $match: { timestamp: { $gte: since } } },
         { $group: { _id: '$severity', count: { $sum: 1 } } }
       ]),
-      AuditLog.aggregate([
+      (AuditLog as any).aggregate([
         { $match: { timestamp: { $gte: since } } },
         { $group: { _id: '$action', count: { $sum: 1 } } },
         { $sort: { count: -1 } },
@@ -305,7 +305,7 @@ export class AuditLogger {
       const cutoffDate = new Date()
       cutoffDate.setDate(cutoffDate.getDate() - retentionDays)
 
-      const result = await AuditLog.deleteMany({
+      const result = await (AuditLog as any).deleteMany({
         timestamp: { $lt: cutoffDate }
       })
 

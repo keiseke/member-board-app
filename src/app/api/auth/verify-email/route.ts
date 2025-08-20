@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     await connectDB()
 
     // トークンでユーザーを検索
-    const user = await User.findOne({
+    const user = await (User as any).findOne({
       emailVerificationToken: token,
       emailVerificationExpires: { $gt: new Date() }
     })

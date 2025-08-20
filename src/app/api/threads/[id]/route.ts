@@ -12,7 +12,7 @@ export async function GET(
     await connectDB();
     const { id } = await params;
     
-    const thread = await Thread.findById(id);
+    const thread = await (Thread as any).findById(id);
     if (!thread) {
       return NextResponse.json(
         { error: 'スレッドが見つかりません' },
@@ -39,7 +39,7 @@ export async function PUT(
     const { id } = await params;
     
     // スレッドの存在確認
-    const existingThread = await Thread.findById(id);
+    const existingThread = await (Thread as any).findById(id);
     if (!existingThread) {
       return NextResponse.json(
         { error: 'スレッドが見つかりません' },
@@ -60,7 +60,7 @@ export async function PUT(
       );
     }
 
-    const thread = await Thread.findByIdAndUpdate(
+    const thread = await (Thread as any).findByIdAndUpdate(
       id,
       {
         title,
@@ -99,7 +99,7 @@ export async function DELETE(
     const { id } = await params;
 
     // スレッドの存在確認
-    const existingThread = await Thread.findById(id);
+    const existingThread = await (Thread as any).findById(id);
     if (!existingThread) {
       return NextResponse.json(
         { error: 'スレッドが見つかりません' },
@@ -111,10 +111,10 @@ export async function DELETE(
     await requireOwnershipOrAdmin(existingThread.creator);
 
     // スレッドを削除
-    await Thread.findByIdAndDelete(id);
+    await (Thread as any).findByIdAndDelete(id);
 
     // スレッドに関連する投稿も削除
-    await Post.deleteMany({ threadId: id });
+    await (Post as any).deleteMany({ threadId: id });
 
     return NextResponse.json({ message: 'スレッドを削除しました' });
   } catch (error) {

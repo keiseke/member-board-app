@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Container,
@@ -15,7 +15,7 @@ import {
 // Icons replaced with text for build compatibility
 // import { Email, CheckCircle, Refresh as RefreshIcon } from '@mui/icons-material'
 
-export default function VerifyEmailPendingPage() {
+function VerifyEmailPendingContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const email = searchParams.get('email')
@@ -174,3 +174,26 @@ export default function VerifyEmailPendingPage() {
   )
 }
 
+export default function VerifyEmailPendingPage() {
+  return (
+    <Suspense fallback={
+      <Container maxWidth="sm">
+        <Box
+          sx={{
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Paper sx={{ p: 4, textAlign: 'center' }}>
+            <CircularProgress sx={{ mb: 2 }} />
+            <Typography variant="h6">読み込み中...</Typography>
+          </Paper>
+        </Box>
+      </Container>
+    }>
+      <VerifyEmailPendingContent />
+    </Suspense>
+  )
+}

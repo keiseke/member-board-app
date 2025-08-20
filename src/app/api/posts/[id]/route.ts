@@ -33,7 +33,7 @@ export async function GET(
       return NextResponse.json({ error: '無効な投稿IDです' }, { status: 400 });
     }
 
-    const post = await Post.findById(id).populate('author', 'name');
+    const post = await (Post as any).findById(id).populate('author', 'name');
     
     if (!post) {
       return NextResponse.json({ error: '投稿が見つかりません' }, { status: 404 });
@@ -83,7 +83,7 @@ export async function PUT(
 
     const { title, content } = validatedFields.data;
 
-    const existingPost = await Post.findById(id);
+    const existingPost = await (Post as any).findById(id);
     
     if (!existingPost) {
       return NextResponse.json({ error: '投稿が見つかりません' }, { status: 404 });
@@ -96,7 +96,7 @@ export async function PUT(
       );
     }
 
-    const post = await Post.findByIdAndUpdate(
+    const post = await (Post as any).findByIdAndUpdate(
       id,
       { title, content },
       { new: true, runValidators: true }
@@ -130,7 +130,7 @@ export async function DELETE(
       return NextResponse.json({ error: '無効な投稿IDです' }, { status: 400 });
     }
 
-    const post = await Post.findById(id);
+    const post = await (Post as any).findById(id);
 
     if (!post) {
       return NextResponse.json({ error: '投稿が見つかりません' }, { status: 404 });
@@ -143,9 +143,9 @@ export async function DELETE(
       );
     }
 
-    await Post.findByIdAndDelete(id);
+    await (Post as any).findByIdAndDelete(id);
 
-    await Thread.findByIdAndUpdate(post.threadId, {
+    await (Thread as any).findByIdAndUpdate(post.threadId, {
       $inc: { postCount: -1 },
       updatedAt: new Date(),
     });
